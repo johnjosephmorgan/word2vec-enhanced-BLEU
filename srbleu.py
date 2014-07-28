@@ -1,60 +1,41 @@
 #!/usr/bin/python
 
-# INSERTED CODE BEGINS, these are some new constants and imports
-import subprocess
 import fileinput
 import sys
 import gensim.models.word2vec as w2v
 
-createVectorsCmd = "./build-on-data.sh"
-getCloseCmd = "./get-top-words.sh"
-# INSERTED CODE ENDS
 
-references = ["Israeli officials are responsible for airport security".split(),
-        "Israel is in charge of the security at this airport".split(),
-        """The security work for this airport is the responsibility of the
-        Israel government""".split(),
-        "Israeli side was in charge of the security of this airport".split()]
-system_a = "Israeli officials responsibility of airport safety".split()
-system_b = "airport security Israeli officials are responsible".split()
-
-# INSERTED CODE BEGINS, this is a function for finding the close words
-def find_close(word, numalts, gensim=False):
+def find_close(model, word, numalts):
     """Finds the [numalts] closest words to [word] according to word2vec"""
-    if gensim:
-        model = w2v.Word2Vec.load_word2vec_format('./dataset.vectors.bin', binary=True)
-        try:
-            return model.most_similar(positive=[word], topn=numalts)
-        except KeyError:
-            return None
-
-    proc = subprocess.Popen([getCloseCmd, word, str(numalts)], stdout=subprocess.PIPE)
-    table = proc.stdout.read().split("\n")[-1 - numalts:-1]
-    if "Out of dictionary word!" in table:
+    try:
+        return model.most_similar(positive=[word], topn=numalts)
+    except KeyError:
         return None
-    words_weights = []
-    for line in table:
-        parts = line.split()
-        words_weights.append((parts[0], float(parts[1])))
-    return words_weights
-# INSERTED CODE ENDS
 
-# INSERTED COD BEGINS, this is a function that finds alternatives
-def get_alts(ref_ngram, ngram, numalts, multi_rep=False):
-    inds = []
+        
+def get_alts(ref_ngram, ngram, model, numalts):
+    """Return a list of alternates for ref_ngram"""
+    inds = []   # This is done so multi-replacement can be implemented later if desired
     alt_ngrams = []
     n = len(ref_ngram)
     for i in range(n):
         if not ref_ngram[i] == ngram[i]:
             inds.append(i)
-    if len(inds) == 1 or (multi_rep and n == 4 and len(inds) == 2):
-        for ind in inds:
-            alt_words = find_close(ref_ngram[ind].lower(), numalts)
-            if not alt_words == None:
-                for pair in alt_words:
-                    alt_ngrams.append((ref_ngram[:ind] + [pair[0]] + ref_ngram[ind+1:], pair[1] ** (1/float(n))))
+    if len(inds) == 1:
+        mismatch_word = ref_ngram[inds[0]]
+        alt_words = find_close(model, mismatch_word.lower(), numalts)
+        if alt_words != None:
+            for pair in alt_words:
+                prefix = ref_ngram[:inds[0]]
+                postfix = ref_ngram[inds[0] + 1:]
+                alt = prefix + [pair[0]] + postfix
+                weight = pair[1] ** (1/float(n))
+                # weight is the geometric mean of the word distances,
+                # which, because only the changed word has a distance not
+                # equal to 1, is just the nth root of the distance
+                alt_ngrams.append((alt, weight))
     return alt_ngrams
-# INSERTED CODE ENDS
+    
     
 def ngrams(sentence, n):
     """Returns the ngrams from a given sentence for a given n."""
@@ -69,16 +50,15 @@ def ngrams(sentence, n):
 
 
 def brevity_penalty(references, output):
-    # Determine the length of the reference closest in length to the output
+    """Determine the length of the reference closest in length to the output"""
     assert len(references) > 0, "References empty!"
     reference_length = min([len(x) for x in references],
                            key= lambda y: y - len(output))
     brevity_penalty = min(1, float(len(output)) / reference_length)
     return brevity_penalty
 
-# MODIFIED CODE BEGINS, added additional parameters to this function
-def bleu(N, references, output, brevity=True, use_w2v=False, threshold=0.0, numAlternatives=2):
-# MODIFIED CODE ENDS
+    
+def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlternatives=2):
     """Implementation of BLEU-N automatic evaluation metric, with lambda=1
     using multiple references."""
     
@@ -93,12 +73,11 @@ def bleu(N, references, output, brevity=True, use_w2v=False, threshold=0.0, numA
                     relevant += 1
                     reference_ngrams.remove(ngram)
                     break
-                # INSERTED CODE BEGINS, this finds the alternatives, selects the best, and updates the reference ngrams and relevant count
-                elif use_w2v:
+                else:
                     best_dist = 0.0
                     alt_ngrams = []
                     for ref_ngram in reference_ngrams:
-                        alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, numalts=numAlternatives, multi_rep=False)
+                        alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives)
                     for alt in alt_ngrams:
                         if alt[0] == ngram:
                             best_dist = alt[1]
@@ -108,7 +87,6 @@ def bleu(N, references, output, brevity=True, use_w2v=False, threshold=0.0, numA
                         relevant += best_dist       # Mirror code above, add the distance instead of 1
                         reference_ngrams.remove(ref_ngram)
                         break
-                # INSERTED CODE ENDS NOW               
 
         # If the output is too short, then we obviously didn't find anything
         # relevant
@@ -124,22 +102,18 @@ def bleu(N, references, output, brevity=True, use_w2v=False, threshold=0.0, numA
     else:
         return product
 
-# INSERTED CODE BEGINS, this is a new front end to make this a useable program
-def main():
-    #subprocess.call(createVectorsCmd)
+
+if __name__=="__main__":
     score_list = {}
     refs = []
+    model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
-    for line in fileinput.input("reference"):
+    for line in fileinput.input(sys.argv[2]):
         refs.append(line.split())
         
     fileinput.close();
     
-    for line in fileinput.input("mt-output"):
-        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, use_w2v=True)
+    for line in fileinput.input(sys.argv[3]):
+        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model)
         
     print score_list
-
-if __name__=="__main__":
-    main()
-# INSERTED CODE ENDS
