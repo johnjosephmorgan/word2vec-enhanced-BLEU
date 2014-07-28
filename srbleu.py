@@ -33,7 +33,7 @@ def get_alts(ref_ngram, ngram, model, numalts):
                 # weight is the geometric mean of the word distances,
                 # which, because only the changed word has a distance not
                 # equal to 1, is just the nth root of the distance
-                alt_ngrams.append((alt, weight))
+                alt_ngrams.append((alt, weight, ref_ngram))
     return alt_ngrams
     
     
@@ -70,25 +70,28 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
         for reference in references:
             reference_ngrams = ngrams(reference, n)
         for ngram in output_ngrams:
+            #print "Looking for: {}".format(ngram)
+            #print "In: {}".format(reference_ngrams)
             if ngram in reference_ngrams:
                 relevant += 1
                 reference_ngrams.remove(ngram)
-                """
+                #print "Found: {}".format(ngram)
             else:
-                best_dist = 0.0
+                #print "Not Found: {}".format(ngram)
+                best_dist = threshold
                 alt_ngrams = []
                 for ref_ngram in reference_ngrams:
                     alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives)
                 for alt in alt_ngrams:
-                    if alt[0] == ngram:
+                    if alt[0] == ngram and alt[1] > best_dist:
+                        #best_alt = alt[0]
                         best_dist = alt[1]
-                        break
+                        best_ref = alt[2]
                 # If we found a good alternative, count it and remove the ngram it came from from the reference
+                #print "Using: {}, dist: {}, from:{}".format(best_alt, best_dist, best_ref)
                 if best_dist > threshold:
                     relevant += best_dist       # Mirror code above, add the distance instead of 1
-                    reference_ngrams.remove(ref_ngram)
-                    break
-                    """
+                    reference_ngrams.remove(best_ref)
 
         # If the output is too short, then we obviously didn't find anything
         # relevant
@@ -96,7 +99,7 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
             precisions.append(float(relevant) / len(output_ngrams))
         else:
             precisions.append(0.0)
-    print precisions
+    #print precisions
     product = reduce(lambda x, y: x * y, precisions)
 
     if brevity:
