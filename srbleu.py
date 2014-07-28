@@ -65,28 +65,30 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
     precisions = []
     for n in range(1, N + 1):
         output_ngrams = ngrams(output, n)
+        reference_ngrams = []
         relevant = 0.0
+        for reference in references:
+            reference_ngrams = ngrams(reference, n)
         for ngram in output_ngrams:
-            for reference in references:
-                reference_ngrams = ngrams(reference, n)
-                if ngram in reference_ngrams:
-                    relevant += 1
-                    reference_ngrams.remove(ngram)
-                    break
-                else:
-                    best_dist = 0.0
-                    alt_ngrams = []
-                    for ref_ngram in reference_ngrams:
-                        alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives)
-                    for alt in alt_ngrams:
-                        if alt[0] == ngram:
-                            best_dist = alt[1]
-                            break
-                    # If we found a good alternative, count it and remove the ngram it came from from the reference
-                    if best_dist > threshold:
-                        relevant += best_dist       # Mirror code above, add the distance instead of 1
-                        reference_ngrams.remove(ref_ngram)
+            if ngram in reference_ngrams:
+                relevant += 1
+                reference_ngrams.remove(ngram)
+                """
+            else:
+                best_dist = 0.0
+                alt_ngrams = []
+                for ref_ngram in reference_ngrams:
+                    alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives)
+                for alt in alt_ngrams:
+                    if alt[0] == ngram:
+                        best_dist = alt[1]
                         break
+                # If we found a good alternative, count it and remove the ngram it came from from the reference
+                if best_dist > threshold:
+                    relevant += best_dist       # Mirror code above, add the distance instead of 1
+                    reference_ngrams.remove(ref_ngram)
+                    break
+                    """
 
         # If the output is too short, then we obviously didn't find anything
         # relevant
@@ -94,7 +96,7 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
             precisions.append(float(relevant) / len(output_ngrams))
         else:
             precisions.append(0.0)
-
+    print precisions
     product = reduce(lambda x, y: x * y, precisions)
 
     if brevity:
@@ -114,6 +116,6 @@ if __name__=="__main__":
     fileinput.close();
     
     for line in fileinput.input(sys.argv[3]):
-        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model)
+        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=False, model=model)
         
     print score_list
