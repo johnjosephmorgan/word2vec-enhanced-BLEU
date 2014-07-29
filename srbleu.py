@@ -26,14 +26,15 @@ def get_alts(ref_ngram, ngram, model, numalts):
         alt_words = find_close(model, mismatch_word.lower(), numalts)
         if alt_words != None:
             for pair in alt_words:
-                prefix = ref_ngram[:inds[0]]
-                postfix = ref_ngram[inds[0] + 1:]
-                alt = prefix + [pair[0]] + postfix
-                weight = pair[1] ** (1/float(n))
-                # weight is the geometric mean of the word distances,
-                # which, because only the changed word has a distance not
-                # equal to 1, is just the nth root of the distance
-                alt_ngrams.append((alt, weight, ref_ngram))
+                if ngram[inds[0]] == pair[0]:
+                    prefix = ref_ngram[:inds[0]]
+                    postfix = ref_ngram[inds[0] + 1:]
+                    alt = prefix + [pair[0]] + postfix
+                    weight = pair[1] ** (1/float(n))
+                    # weight is the geometric mean of the word distances,
+                    # which, because only the changed word has a distance not
+                    # equal to 1, is just the nth root of the distance
+                    alt_ngrams.append((alt, weight, ref_ngram))
     return alt_ngrams
     
     
@@ -68,7 +69,7 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
         reference_ngrams = []
         relevant = 0.0
         for reference in references:
-            reference_ngrams = ngrams(reference, n)
+            reference_ngrams += ngrams(reference, n)
         for ngram in output_ngrams:
             #print "Looking for: {}".format(ngram)
             #print "In: {}".format(reference_ngrams)
