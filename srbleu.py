@@ -95,7 +95,7 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
                         best_ref = alt[2]
                 # If we found a good alternative, count it and remove the ngram it came from from the reference
                 if debug:
-                    print "Using: {}, dist: {}, from:{}".format(best_alt, best_dist, best_ref)
+                    print "Using: {}, weight: {}, from:{}".format(best_alt, best_dist, best_ref)
                 if best_dist > threshold:
                     relevant += best_dist       # Mirror code above, add the distance instead of 1
                     reference_ngrams.remove(best_ref)
@@ -108,6 +108,9 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
             precisions.append(0.0)
             
     product = reduce(lambda x, y: x * y, precisions)
+    
+    if debug:
+        print precisions
 
     if brevity:
         return brevity_penalty(references, output) * product
@@ -126,6 +129,6 @@ if __name__=="__main__":
     fileinput.close();
     
     for line in fileinput.input(sys.argv[3]):
-        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model, debug=False)
+        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model, numAlternatives=5)
         
     print score_list
