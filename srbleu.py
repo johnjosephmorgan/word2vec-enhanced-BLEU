@@ -59,7 +59,7 @@ def brevity_penalty(references, output):
     return brevity_penalty
 
     
-def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlternatives=2):
+def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlternatives=2, debug=False):
     """Implementation of BLEU-N automatic evaluation metric, with lambda=1
     using multiple references."""
     
@@ -71,25 +71,31 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
         for reference in references:
             reference_ngrams += ngrams(reference, n)
         for ngram in output_ngrams:
-            #print "Looking for: {}".format(ngram)
-            #print "In: {}".format(reference_ngrams)
+            if debug:
+                print "Looking for: {}".format(ngram)
+                print "In: {}".format(reference_ngrams)
             if ngram in reference_ngrams:
                 relevant += 1
                 reference_ngrams.remove(ngram)
-                #print "Found: {}".format(ngram)
+                if debug:
+                    print "Found: {}".format(ngram)
             else:
-                #print "Not Found: {}".format(ngram)
+                if debug:
+                    print "Not Found: {}".format(ngram)
+                best_alt = None
+                best_ref = None
                 best_dist = threshold
                 alt_ngrams = []
                 for ref_ngram in reference_ngrams:
                     alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives)
                 for alt in alt_ngrams:
                     if alt[0] == ngram and alt[1] > best_dist:
-                        #best_alt = alt[0]
+                        best_alt = alt[0]
                         best_dist = alt[1]
                         best_ref = alt[2]
                 # If we found a good alternative, count it and remove the ngram it came from from the reference
-                #print "Using: {}, dist: {}, from:{}".format(best_alt, best_dist, best_ref)
+                if debug:
+                    print "Using: {}, dist: {}, from:{}".format(best_alt, best_dist, best_ref)
                 if best_dist > threshold:
                     relevant += best_dist       # Mirror code above, add the distance instead of 1
                     reference_ngrams.remove(best_ref)
@@ -100,7 +106,7 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
             precisions.append(float(relevant) / len(output_ngrams))
         else:
             precisions.append(0.0)
-    #print precisions
+            
     product = reduce(lambda x, y: x * y, precisions)
 
     if brevity:
@@ -120,6 +126,6 @@ if __name__=="__main__":
     fileinput.close();
     
     for line in fileinput.input(sys.argv[3]):
-        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=False, model=model)
+        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model, debug=False)
         
     print score_list
