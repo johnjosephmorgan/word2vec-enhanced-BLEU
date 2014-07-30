@@ -60,11 +60,12 @@ def brevity_penalty(references, output):
     return brevity_penalty
 
     
-def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlternatives=2, debug=False):
+def bleu(N, references, output, model=None, threshold=0.0, numAlternatives=2, debug=False):
     """Implementation of BLEU-N automatic evaluation metric, with lambda=1
     using multiple references."""
     
-    precisions = []
+    relevants = []
+    counts = []
     for n in range(1, N + 1):
         output_ngrams = ngrams(output, n)
         reference_ngrams = []
@@ -109,29 +110,20 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
                         if best_ref in reference:
                             reference_ngrams.remove(best_ref)
                             reference.remove(best_ref)
-                
-        # If the output is too short, then we obviously didn't find anything
-        # relevant
-        if output_ngrams:
-            precisions.append((relevant, len(output_ngrams)))
-        else:
-            precisions.append((0.0, len(output_ngrams)))
-            
-    #product = reduce(lambda x, y: x * y, precisions)
-    
+
+        relevants.append(relevant)
+        counts.append(len(output_ngrams))
+
     if debug:
-        print precisions
-        
-    """
-    if brevity:
-        return brevity_penalty(references, output) * product
-    else:
-        return product
-    """
-    return precisions
+        print relevants
+
+    return relevants, counts
 
 if __name__=="__main__":
-    score_list = []
+    maxN = 4
+    rel_totals = [0.0] * maxN
+    count_totals = [0] * maxN
+    brev_list = []
     model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
     for line in fileinput.input(sys.argv[2]):
@@ -139,7 +131,19 @@ if __name__=="__main__":
         parts = re.split(string=line, pattern="\s*\|+\s*")
         for p in parts[1:]:
             refs.append(p.split())
-        score_list.append(bleu(N=4, references=refs, output=parts[0].split(), brevity=False, model=model, numAlternatives=5, debug=False))
-        
+        outp = parts[0].split()
+        rels, counts = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
+        brev_list.append(brevity_penalty(refs, outp))
+        # Now, for the given output and refs, rels = [1-gram relevant, 2-gram relevant...], counts = [1-gram count, ...]
+        for i in range(maxN):
+            rel_totals[i] += rels[i]
+            count_totals[i] += counts[i]
+
     fileinput.close()
-    print score_list
+
+    product = 1.0
+    for i in range(maxN):
+        product *= (rel_totals[i] / count_totals[i])
+
+    print "Final Score: {}".format(product ** (1/float(maxN)))
+    print "Brevity List: {}".format(brev_list)
