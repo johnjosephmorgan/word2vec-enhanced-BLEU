@@ -50,15 +50,6 @@ def ngrams(sentence, n):
 
     return ngrams
 
-
-def brevity_penalty(references, output):
-    """Determine the length of the reference closest in length to the output"""
-    assert len(references) > 0, "References empty!"
-    reference_length = min([len(x) for x in references],
-                           key= lambda y: y - len(output))
-    brevity_penalty = min(1, float(len(output)) / reference_length)
-    return brevity_penalty
-
     
 def bleu(N, references, output, model=None, threshold=0.0, numAlternatives=2, debug=False):
     """Implementation of BLEU-N automatic evaluation metric, with lambda=1
@@ -123,7 +114,6 @@ if __name__=="__main__":
     maxN = 4
     rel_totals = [0.0] * maxN
     count_totals = [0] * maxN
-    brev_list = []
     model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
     for line in fileinput.input(sys.argv[2]):
@@ -133,7 +123,6 @@ if __name__=="__main__":
             refs.append(p.split())
         outp = parts[0].split()
         rels, counts = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
-        brev_list.append(brevity_penalty(refs, outp))
         # Now, for the given output and refs, rels = [1-gram relevant, 2-gram relevant...], counts = [1-gram count, ...]
         for i in range(maxN):
             rel_totals[i] += rels[i]
@@ -146,4 +135,3 @@ if __name__=="__main__":
         product *= (rel_totals[i] / count_totals[i])
 
     print "Final Score: {}".format(product ** (1/float(maxN)))
-    print "Brevity List: {}".format(brev_list)
