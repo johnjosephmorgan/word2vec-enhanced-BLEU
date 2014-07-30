@@ -2,6 +2,7 @@
 
 import fileinput
 import sys
+import re
 import gensim.models.word2vec as w2v
 
 
@@ -67,18 +68,22 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
     for n in range(1, N + 1):
         output_ngrams = ngrams(output, n)
         reference_ngrams = []
+        remove_helper = []
         relevant = 0.0
         for reference in references:
-            reference_ngrams += ngrams(reference, n)
+            temp = ngrams(reference, n)
+            reference_ngrams += temp
+            remove_helper.append(temp)
         for ngram in output_ngrams:
             if debug:
                 print "Looking for: {}".format(ngram)
                 print "In: {}".format(reference_ngrams)
             if ngram in reference_ngrams:
                 relevant += 1
-                for reference in references:
-                    if " ".join(ngram) in reference:
+                for reference in remove_helper:
+                    if ngram in reference:
                         reference_ngrams.remove(ngram)
+                        reference.remove(ngram)
                 if debug:
                     print "Found: {}".format(ngram)
             else:
@@ -100,39 +105,41 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
                     print "Using: {}, weight: {}, from:{}".format(best_alt, best_dist, best_ref)
                 if best_dist > threshold:
                     relevant += best_dist       # Mirror code above, add the distance instead of 1
-                    for reference in references:
-                        if " ".join(best_ref) in reference:
+                    for reference in remove_helper:
+                        if best_ref in reference:
                             reference_ngrams.remove(best_ref)
+                            reference.remove(best_ref)
                 
         # If the output is too short, then we obviously didn't find anything
         # relevant
         if output_ngrams:
-            precisions.append(float(relevant) / len(output_ngrams))
+            precisions.append((relevant, len(output_ngrams)))
         else:
-            precisions.append(0.0)
+            precisions.append((0.0, len(output_ngrams)))
             
-    product = reduce(lambda x, y: x * y, precisions)
+    #product = reduce(lambda x, y: x * y, precisions)
     
     if debug:
         print precisions
-
+        
+    """
     if brevity:
         return brevity_penalty(references, output) * product
     else:
         return product
-
+    """
+    return precisions
 
 if __name__=="__main__":
-    score_list = {}
-    refs = []
+    score_list = []
     model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
     for line in fileinput.input(sys.argv[2]):
-        refs.append(line.split())
+        refs = []
+        parts = re.split(string=line, pattern="\s*\|+\s*")
+        for p in parts[1:]:
+            refs.append(p.split())
+        score_list.append(bleu(N=4, references=refs, output=parts[0].split(), brevity=False, model=model, numAlternatives=5, debug=False))
         
-    fileinput.close();
-    
-    for line in fileinput.input(sys.argv[3]):
-        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model, numAlternatives=5, debug=False)
-        
+    fileinput.close()
     print score_list
