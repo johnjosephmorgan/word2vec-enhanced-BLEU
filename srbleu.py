@@ -76,7 +76,9 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
                 print "In: {}".format(reference_ngrams)
             if ngram in reference_ngrams:
                 relevant += 1
-                reference_ngrams.remove(ngram)
+                for reference in references:
+                    if " ".join(ngram) in reference:
+                        reference_ngrams.remove(ngram)
                 if debug:
                     print "Found: {}".format(ngram)
             else:
@@ -98,8 +100,10 @@ def bleu(N, references, output, brevity=True, model=None, threshold=0.0, numAlte
                     print "Using: {}, weight: {}, from:{}".format(best_alt, best_dist, best_ref)
                 if best_dist > threshold:
                     relevant += best_dist       # Mirror code above, add the distance instead of 1
-                    reference_ngrams.remove(best_ref)
-
+                    for reference in references:
+                        if " ".join(best_ref) in reference:
+                            reference_ngrams.remove(best_ref)
+                
         # If the output is too short, then we obviously didn't find anything
         # relevant
         if output_ngrams:
@@ -129,6 +133,6 @@ if __name__=="__main__":
     fileinput.close();
     
     for line in fileinput.input(sys.argv[3]):
-        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model, numAlternatives=5)
+        score_list[line] = bleu(N=4, references=refs, output=line.split(), brevity=True, model=model, numAlternatives=5, debug=False)
         
     print score_list
