@@ -1,34 +1,31 @@
 #!/usr/bin/python
 
-import fileinput
 import sys
 import re
 import gensim.models.word2vec as w2v
 
 def get_alts(ref_ngram, ngram, model, numalts):
-    """Return a list of alternates for ref_ngram"""
-    inds = []   # This is done so multi-replacement can be implemented later if desired
+    """Returns a list of weights of the alternate n-grams generated.
+    Alternate n-grams are guaranteed to match the argument ngram."""
+    ind = -1
     alt_ngrams = []
     n = len(ref_ngram)
+    
     for i in range(n):
         if not ref_ngram[i] == ngram[i]:
-            inds.append(i)
-    if len(inds) == 1:
-        mismatch_word = ref_ngram[inds[0]]
-        try:
-            alt_words = model.most_similar(positive=[mismatch_word.lower()], topn=numalts)
-        except KeyError:
-            return []
-        for pair in alt_words:
-            if ngram[inds[0]] == pair[0]:
-                prefix = ref_ngram[:inds[0]]
-                postfix = ref_ngram[inds[0] + 1:]
-                alt = prefix + [pair[0]] + postfix
-                weight = pair[1] ** (1/float(n))
-                # weight is the geometric mean of the word distances,
-                # which, because only the changed word has a distance not
-                # equal to 1, is just the nth root of the distance
-                alt_ngrams.append((alt, weight, ref_ngram))
+            if ind >= 0:    # Already found a mismatched word, so we can't use this
+                break
+            ind = i
+    else:   # Only found at most 1 mistmatched word
+        if ind >= 0:    # Confirm we found 1, not 0 mismatched words
+            try:
+                alt_words = model.most_similar(positive=[ref_ngram[ind].lower()], topn=numalts)
+            except KeyError:    # Out of dictionary word
+                return []
+            for pair in alt_words:
+                if ngram[ind] == pair[0]:   # Found a match
+                    alt_ngrams.append(pair[1] ** (1/float(n)))  # Weight = geometric mean of word distances
+                
     return alt_ngrams
     
     
@@ -55,14 +52,17 @@ def bleu(N, references, output, model=None, threshold=0.0, numAlternatives=2, de
         reference_ngrams = []
         remove_helper = []
         relevant = 0.0
-        for reference in references:
+        
+        for reference in references:    # Build up reference_ngrams list, as well as an additional list used to ensure proper removals
             temp = ngrams(reference, n)
             reference_ngrams += temp
             remove_helper.append(temp)
+            
         for ngram in output_ngrams:
             if debug:
                 print "Looking for: {}".format(ngram)
                 print "In: {}".format(reference_ngrams)
+                
             if ngram in reference_ngrams:
                 relevant += 1
                 for reference in remove_helper:
@@ -74,20 +74,20 @@ def bleu(N, references, output, model=None, threshold=0.0, numAlternatives=2, de
             else:
                 if debug:
                     print "Not Found: {}".format(ngram)
+                    
                 best_alt = None
                 best_ref = None
                 best_dist = threshold
-                alt_ngrams = []
                 for ref_ngram in reference_ngrams:
-                    alt_ngrams += get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives)
-                for alt in alt_ngrams:
-                    if alt[0] == ngram and alt[1] > best_dist:
-                        best_alt = alt[0]
-                        best_dist = alt[1]
-                        best_ref = alt[2]
-                # If we found a good alternative, count it and remove the ngram it came from from the reference
+                    for alt in get_alts(ref_ngram=ref_ngram, ngram=ngram, model=model, numalts=numAlternatives):
+                        if alt > best_dist:
+                            best_dist = alt
+                            best_ref = ref_ngram
+                            
                 if debug:
-                    print "Using: {}, weight: {}, from:{}".format(best_alt, best_dist, best_ref)
+                    print "Close to: {}, Weight: {}".format(best_ref, best_dist)
+                    
+                # If we found a good alternative, count it and remove the ngram it came from from the reference
                 if best_dist > threshold:
                     relevant += best_dist       # Mirror code above, add the distance instead of 1
                     for reference in remove_helper:
@@ -101,40 +101,40 @@ def bleu(N, references, output, model=None, threshold=0.0, numAlternatives=2, de
         print relevants
 
     return relevants
+    
 
 if __name__=="__main__":
-    maxN = 4
-    rel_totals = [0.0] * maxN
-    count_totals = [0] * maxN
-    ref_len = 0
-    corp_len = 0
-    product = 1.0
-    brevity = 1.0
-    const_e = 2.7182818     # more than enough sig figs for this
-    model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
+    maxN = 4    # Maximum Precision
+    rel_totals = [0.0] * maxN   # Holds the total relevant scores for each precision
+    count_totals = [0] * maxN   # Holds the total word counts for each precision
+    ref_len = 0     # Holds the length of the reference text, w/ multiple refs this is as close to corp_len as possible
+    corp_len = 0    # Hold the corpus length
+    brevity = 1.0   # Brevity penalty, assumed to be 1.0 but recalculated later based on ref_len and corp_len
+    const_e = 2.7182818     # Natural log base, this is more than enough sig figs for this
+    model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)   # gensim model
 
     with open(sys.argv[2]) as f:
         for line in f:
             refs = []
-            parts = re.split(string=line, pattern="\s*\|+\s*")
+            parts = re.split(string=line, pattern="\s*\|+\s*")      # Assumes the file has the pattern output ||| ref | ref...
             for p in parts[1:]:
-                refs.append(p.split())
+                refs.append(p.split())      # Build up list of references
             outp = parts[0].split()        
-            rels = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
+            rels = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5)  # Actual BLEU step
             for i in range(maxN):
                 rel_totals[i] += rels[i]
                 count_totals[i] += max(0, len(outp) - i)
-            # Finally, work out what to add to the total reference length and corpus length
             # Add the length of the reference that is closest (in absolute distance) to len(outp) to ref_len
             ref_len += min([len(x) for x in refs], key=lambda y: abs(y - len(outp)))
             # And add len(outp) to corp_len
             corp_len += len(outp)
 
     # Compute the product over all the precisions of, for each precision, the total relevant score and total count
-    for i in range(maxN):
-        product *= (rel_totals[i] / count_totals[i])
+    placeholder = [(rel_totals[i] / count_totals[i]) for i in range(maxN)]  # divide the sums for each precision
+    score = reduce(lambda x,y: x*y, placeholder) ** (1/float(maxN))         # then take the geometric mean to get the score
 
-    if corp_len < ref_len:  # Apply brevity penalty
+    if corp_len < ref_len:  # Calculate brevity penalty if necessary
         brevity = const_e ** (1 - (float(ref_len) / corp_len))
-        
-    print "Final Score: {}".format((product ** (1/float(maxN))) * brevity)
+
+    # And finally, print the score multiplied by the brevity penalty
+    print "Final Score: {}".format(score * brevity)
