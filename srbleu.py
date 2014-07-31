@@ -104,12 +104,11 @@ def bleu(N, references, output, model=None, threshold=0.0, numAlternatives=2, de
                             reference.remove(best_ref)
 
         relevants.append(relevant)
-        counts.append(len(output_ngrams))
 
     if debug:
         print relevants
 
-    return relevants, counts
+    return relevants
 
 if __name__=="__main__":
     maxN = 4
@@ -125,8 +124,10 @@ if __name__=="__main__":
         for p in parts[1:]:
             refs.append(p.split())
         outp = parts[0].split()        
-        rels, counts = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
-        # Now, for the given output and refs, rels = [1-gram relevant, 2-gram relevant...], counts = [1-gram count, ...]
+        rels = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
+        counts = range(len(outp) + 1)[-maxN:]
+        counts.reverse()
+        counts += [0] * (maxN - len(outp) - 1)
         for i in range(maxN):
             rel_totals[i] += rels[i]
             count_totals[i] += counts[i]
