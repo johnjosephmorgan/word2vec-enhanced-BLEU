@@ -4,6 +4,7 @@ import fileinput
 import sys
 import re
 import gensim.models.word2vec as w2v
+import numpy
 
 
 def find_close(model, word, numalts):
@@ -114,6 +115,8 @@ if __name__=="__main__":
     maxN = 4
     rel_totals = [0.0] * maxN
     count_totals = [0] * maxN
+    ref_len = 0
+    corp_len = 0
     model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
     for line in fileinput.input(sys.argv[2]):
@@ -121,17 +124,28 @@ if __name__=="__main__":
         parts = re.split(string=line, pattern="\s*\|+\s*")
         for p in parts[1:]:
             refs.append(p.split())
-        outp = parts[0].split()
+        outp = parts[0].split()        
         rels, counts = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
         # Now, for the given output and refs, rels = [1-gram relevant, 2-gram relevant...], counts = [1-gram count, ...]
         for i in range(maxN):
             rel_totals[i] += rels[i]
             count_totals[i] += counts[i]
+        # Finally, work out what to add to the total reference length and corpus length
+        # Add the length of the reference that is closest (in absolute distance) to len(outp) to ref_len
+        ref_len += min([len(x) for x in refs], key=lambda y: abs(y - len(outp)))
+        # And add len(outp) to corp_len
+        corp_len += len(outp)
 
     fileinput.close()
 
+    # Compute the product over all the precisions of, for each precision, the total relevant score and total count
     product = 1.0
     for i in range(maxN):
         product *= (rel_totals[i] / count_totals[i])
 
-    print "Final Score: {}".format(product ** (1/float(maxN)))
+    if corp_len < ref_len:  # Apply brevity penalty
+        brevity = numpy.e ** (1 - (float(ref_len)) / corp_len)
+    else:
+        brevity = 1.0
+        
+    print "Final Score: {}".format((product ** (1/float(maxN))) * brevity)
