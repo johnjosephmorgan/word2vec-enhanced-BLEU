@@ -125,12 +125,9 @@ if __name__=="__main__":
             refs.append(p.split())
         outp = parts[0].split()        
         rels = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
-        counts = range(len(outp) + 1)[-maxN:]
-        counts.reverse()
-        counts += [0] * (maxN - len(outp) - 1)
         for i in range(maxN):
             rel_totals[i] += rels[i]
-            count_totals[i] += counts[i]
+            count_totals[i] += max(0, len(outp) - i)
         # Finally, work out what to add to the total reference length and corpus length
         # Add the length of the reference that is closest (in absolute distance) to len(outp) to ref_len
         ref_len += min([len(x) for x in refs], key=lambda y: abs(y - len(outp)))
@@ -145,7 +142,7 @@ if __name__=="__main__":
         product *= (rel_totals[i] / count_totals[i])
 
     if corp_len < ref_len:  # Apply brevity penalty
-        brevity = numpy.e ** (1 - (float(ref_len)) / corp_len)
+        brevity = numpy.e ** (1 - (float(ref_len) / corp_len))
     else:
         brevity = 1.0
         
