@@ -4,17 +4,7 @@ import fileinput
 import sys
 import re
 import gensim.models.word2vec as w2v
-import numpy
 
-
-def find_close(model, word, numalts):
-    """Finds the [numalts] closest words to [word] according to word2vec"""
-    try:
-        return model.most_similar(positive=[word], topn=numalts)
-    except KeyError:
-        return None
-
-        
 def get_alts(ref_ngram, ngram, model, numalts):
     """Return a list of alternates for ref_ngram"""
     inds = []   # This is done so multi-replacement can be implemented later if desired
@@ -25,18 +15,20 @@ def get_alts(ref_ngram, ngram, model, numalts):
             inds.append(i)
     if len(inds) == 1:
         mismatch_word = ref_ngram[inds[0]]
-        alt_words = find_close(model, mismatch_word.lower(), numalts)
-        if alt_words != None:
-            for pair in alt_words:
-                if ngram[inds[0]] == pair[0]:
-                    prefix = ref_ngram[:inds[0]]
-                    postfix = ref_ngram[inds[0] + 1:]
-                    alt = prefix + [pair[0]] + postfix
-                    weight = pair[1] ** (1/float(n))
-                    # weight is the geometric mean of the word distances,
-                    # which, because only the changed word has a distance not
-                    # equal to 1, is just the nth root of the distance
-                    alt_ngrams.append((alt, weight, ref_ngram))
+        try:
+            alt_words = model.most_similar(positive=[mismatch_word.lower()], topn=numalts)
+        except KeyError:
+            return []
+        for pair in alt_words:
+            if ngram[inds[0]] == pair[0]:
+                prefix = ref_ngram[:inds[0]]
+                postfix = ref_ngram[inds[0] + 1:]
+                alt = prefix + [pair[0]] + postfix
+                weight = pair[1] ** (1/float(n))
+                # weight is the geometric mean of the word distances,
+                # which, because only the changed word has a distance not
+                # equal to 1, is just the nth root of the distance
+                alt_ngrams.append((alt, weight, ref_ngram))
     return alt_ngrams
     
     
@@ -116,34 +108,33 @@ if __name__=="__main__":
     count_totals = [0] * maxN
     ref_len = 0
     corp_len = 0
+    product = 1.0
+    brevity = 1.0
+    const_e = 2.7182818     # more than enough sig figs for this
     model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
-    for line in fileinput.input(sys.argv[2]):
-        refs = []
-        parts = re.split(string=line, pattern="\s*\|+\s*")
-        for p in parts[1:]:
-            refs.append(p.split())
-        outp = parts[0].split()        
-        rels = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
-        for i in range(maxN):
-            rel_totals[i] += rels[i]
-            count_totals[i] += max(0, len(outp) - i)
-        # Finally, work out what to add to the total reference length and corpus length
-        # Add the length of the reference that is closest (in absolute distance) to len(outp) to ref_len
-        ref_len += min([len(x) for x in refs], key=lambda y: abs(y - len(outp)))
-        # And add len(outp) to corp_len
-        corp_len += len(outp)
-
-    fileinput.close()
+    with open(sys.argv[2]) as f:
+        for line in f:
+            refs = []
+            parts = re.split(string=line, pattern="\s*\|+\s*")
+            for p in parts[1:]:
+                refs.append(p.split())
+            outp = parts[0].split()        
+            rels = bleu(N=maxN, references=refs, output=outp, model=model, numAlternatives=5, debug=False)
+            for i in range(maxN):
+                rel_totals[i] += rels[i]
+                count_totals[i] += max(0, len(outp) - i)
+            # Finally, work out what to add to the total reference length and corpus length
+            # Add the length of the reference that is closest (in absolute distance) to len(outp) to ref_len
+            ref_len += min([len(x) for x in refs], key=lambda y: abs(y - len(outp)))
+            # And add len(outp) to corp_len
+            corp_len += len(outp)
 
     # Compute the product over all the precisions of, for each precision, the total relevant score and total count
-    product = 1.0
     for i in range(maxN):
         product *= (rel_totals[i] / count_totals[i])
 
     if corp_len < ref_len:  # Apply brevity penalty
-        brevity = numpy.e ** (1 - (float(ref_len) / corp_len))
-    else:
-        brevity = 1.0
+        brevity = const_e ** (1 - (float(ref_len) / corp_len))
         
     print "Final Score: {}".format((product ** (1/float(maxN))) * brevity)
