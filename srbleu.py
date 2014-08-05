@@ -2,7 +2,7 @@
 
 import sys
 import re
-import gensim.models.word2vec.Word2Vec as w2v
+import gensim.models.word2vec as w2v
 
 
 def get_alts(ref_ngram, ngram, model, numalts):
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     corplen = 0     # The corpus length
     brevity = 1.0   # Brevity penalty, defaulting to 1.0
     const_e = 2.7182818     # Natural log base
-    model = w2v.load_word2vec_format(fname=sys.argv[1], binary=True)
+    model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
 
     with open(sys.argv[2]) as f:
         for line in f:
@@ -120,7 +120,7 @@ if __name__ == "__main__":
                 count_totals[i] += max(0, len(outp) - i)
             # Add the length of the reference that is closest
             # (in absolute distance) to len(outp) to ref_len
-            reflen += min([len(x) for x in refs], lambda y: abs(y - len(outp)))
+            reflen += min([len(x) for x in refs], key=lambda y: abs(y - len(outp)))
             # And add len(outp) to corp_len
             corplen += len(outp)
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # then take the geometric mean to get the score
     score = reduce(lambda x, y: x*y, placeholder) ** (1/float(maxN))
 
-    if corp_len < ref_len:  # Calculate brevity penalty if necessary
+    if corplen < reflen:  # Calculate brevity penalty if necessary
         brevity = const_e ** (1 - (float(reflen) / corplen))
 
     # And finally, print the score multiplied by the brevity penalty
