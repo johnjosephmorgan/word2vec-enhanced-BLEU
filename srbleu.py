@@ -1,8 +1,6 @@
-#!/usr/bin/python
-
 import sys
 import re
-import gensim.models.word2vec as w2v
+from gensim.models.word2vec import Word2Vec as w2v
 
 
 def get_alts(ref_ngram, ngram, model, numalts):
@@ -46,7 +44,7 @@ def ngrams(sentence, n):
     return ngrams
 
 
-def bleu(N, references, output, model=None, numalts=2, threshold=0.0):
+def bleu(N, references, output, model, numalts=2, threshold=0.0):
     """Implementation of BLEU-N automatic evaluation metric, with lambda=1
     using multiple references."""
 
@@ -97,6 +95,9 @@ def bleu(N, references, output, model=None, numalts=2, threshold=0.0):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print "error: Needs exactly 2 arguments, a binary vector file, and a file to score"
+        
     maxN = 4    # Maximum Precision
     rel_totals = [0.0] * maxN   # Total relevant for each precision
     count_totals = [0] * maxN   # Total word counts for each precision
@@ -104,13 +105,13 @@ if __name__ == "__main__":
     corplen = 0     # The corpus length
     brevity = 1.0   # Brevity penalty, defaulting to 1.0
     const_e = 2.7182818     # Natural log base
-    model = w2v.Word2Vec.load_word2vec_format(fname=sys.argv[1], binary=True)
+    model = w2v.load_word2vec_format(fname=sys.argv[1], binary=True)
 
     with open(sys.argv[2]) as f:
         for line in f:
             refs = []
             # Assumes the file has the pattern output ||| ref | ref...
-            parts = re.split(string=line, pattern="\s*\|+\s*")
+            parts = re.split(string=line, pattern="\s*\|\|\|\s*")
             for p in parts[1:]:
                 refs.append(p.split())  # Build up list of references
             outp = parts[0].split()
@@ -135,4 +136,6 @@ if __name__ == "__main__":
         brevity = const_e ** (1 - (float(reflen) / corplen))
 
     # And finally, print the score multiplied by the brevity penalty
+    for ind, obj in enumerate(placeholder):
+        print "Precision: {}, Score: {}".format(ind+1, obj)
     print "Final Score: {}".format(score * brevity)
