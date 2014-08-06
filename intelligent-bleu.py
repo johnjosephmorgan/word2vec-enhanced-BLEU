@@ -43,9 +43,14 @@ def ngrams(sentence, n):
     return ngrams
 
 
-def bleu(N, references, output, model, numalts=2, threshold=0.0, use_w2v=True, debug=False):
-    """Implementation of BLEU-N automatic evaluation metric, with lambda=1
-    using multiple references."""
+def bleu(N, references, output, model, numalts=2, threshold=0.0):
+    """Performs the intelligent BLEU evaluation.
+    N is the maximum precision
+    references contains a list of sentences (arrays) that are the references
+    output is a sentence (array) that is the output line
+    model is the Word2Vec model to be used
+    numalts is the number of alternate words to try, defaulting to 2
+    threshold is the minimum cosine distance necessary for words to be considered similar, defaults to 0"""
 
     relevants = []
     counts = []
@@ -63,20 +68,13 @@ def bleu(N, references, output, model, numalts=2, threshold=0.0, use_w2v=True, d
             remove_helper.append(temp)
 
         for ngram in output_ngrams:
-            if debug:
-                print "Looking for: {}".format(ngram)
-                print "In: {}".format(reference_ngrams)
             if ngram in reference_ngrams:
-                if debug:
-                    print "Found"
                 relevant += 1
                 for reference in remove_helper:
                     if ngram in reference:
                         reference_ngrams.remove(ngram)
                         reference.remove(ngram)
-            elif use_w2v:
-                if debug:
-                    print "Not Found"
+            else:
                 best_alt = None
                 best_ref = None
                 best_dist = threshold
@@ -89,8 +87,6 @@ def bleu(N, references, output, model, numalts=2, threshold=0.0, use_w2v=True, d
                 # If we found a good alternative, count it and remove
                 # the ngram it came from from the reference
                 if best_dist > threshold:
-                    if debug:
-                        print "Found Alt From: {}, Weight: {}".format(best_ref, best_dist)
                     # Mirror code above, add the distance instead of 1
                     relevant += best_dist
                     for reference in remove_helper:
@@ -103,10 +99,20 @@ def bleu(N, references, output, model, numalts=2, threshold=0.0, use_w2v=True, d
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print "error: Needs exactly 2 arguments, a binary vector file, and a file to score"
+    if len(sys.argv) < 3:
+        print """error: Not enough arguments.
+Usage: {} vector-file file-to-score [-a alternates] [-n precision] [-t threshold]
+    vector-file: binary file of word2vec vectors
+    file-to-score: file containing data to score, lines of the form "output ||| ref1 ||| ref2 ..."
+    alternates: number of alternate words to try when doing replacement, integer, defaults to 2
+    precision: maximum precision to use, integer, defaults to 4
+    threshold: minimum closeness of word replacements, float, defaults to 0.0,
+        using values greater than or equal to 1 effectively disables w2v""".format(sys.argv[0])
+        exit()
 
-    maxN = 4    # Maximum Precision
+    maxN = 4        # Maximum Precision
+    nAlts = 2       # Number of alternate words to try
+    thresh = 0.0    # Threshold of closeness
     rel_totals = [0.0] * maxN   # Total relevant for each precision
     count_totals = [0] * maxN   # Total word counts for each precision
     reflen = 0      # The length of the reference text
@@ -115,16 +121,30 @@ if __name__ == "__main__":
     const_e = 2.7182818     # Natural log base
     model = w2v.load_word2vec_format(fname=sys.argv[1], binary=True)
 
+    try:
+        for i in xrange(3, len(sys.argv), 2):
+            if sys.argv[i] == "-a":
+                nAlts = int(sys.argv[i+1])
+            elif sys.argv[i] == "-n":
+                maxN = int(sys.argv[i+1])
+            elif sys.argv[i] == "-t":
+                thresh = float(sys.argv[i+1])
+            else:
+                raise ValueError("Bad Argument")
+    except ValueError:
+        print "Bad argument: {}".format(" ".join(sys.argv[i:i+2]))
+        exit()
+
     with open(sys.argv[2]) as f:
         for line in f:
             refs = []
             # Assumes the file has the pattern output ||| ref | ref...
-            parts = re.split(string=line, pattern="\s*\|\|\|\s*")
+            parts = line.split("|||")
             for p in parts[1:]:
                 tmp = p.translate(string.maketrans("",""), string.punctuation)
                 refs.append(tmp.split())  # Build up list of references
             outp = parts[0].split()
-            rels = bleu(maxN, refs, outp, model, numalts=2)  # BLEU step
+            rels = bleu(maxN, refs, outp, model, numalts=nAlts, threshold=thresh)  # BLEU step
             for i in range(maxN):
                 rel_totals[i] += rels[i]
                 count_totals[i] += max(0, len(outp) - i)
