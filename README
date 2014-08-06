@@ -5,6 +5,7 @@ Pre-Requisites
     gensim
         Install this with pip or easy_install
         Requires numpy, scipy, and cython. Install those with pip or easy_install as well
+        Refer to http://radimrehurek.com/gensim/ for the download if needed
     Semi-optional: word2vec
         Execute the command "svn checkout http://word2vec.googlecode.com/sv/trunk/"
         Run "make" to compile the tools
