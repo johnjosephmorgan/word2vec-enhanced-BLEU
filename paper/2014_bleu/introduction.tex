@@ -31,36 +31,6 @@ Meteor\cite{banerjee-lavie2005MTSumm} is an evaluation metric that takes into co
 
 Meteor extends BLEU by incorporating semantic features into the evaluation of SMT output. We similarly enhance BLEU with semantic knowledge by replacing words in the reference transcriptions with words that are close in meaning. 
 
-The word2vec tool is used to build a vector space word distribution model of the target language. Then a distance function is used to generate a neighborhood of words that are close to the words in the reference transcriptions. Word2vec only has one language-dependent requirement:a large monolingual corpus of text. It does not require a parser, a stemmer, or a part of speech tagger.
-The representations of languages are learned using the distributed Skip-gram or Continuous Bag-of-Words (CBOW) models recently proposed by . These models learn word representations using a neural network architecture that   predicts the neighbors of a word.
-
-The traditional BLEU metric measures the overlap of $n$-grams from the decoder
-output with $n$-grams from the reference transcription sentences.
-Credit is given to the decoder output $n$-gram only when there is an exact
-string to string match.
-If the reference sentence was:
-
-The boy went to the store
-
-But the decoder output:
-
-The boy went to the supermarket
-
-BLEU would assign no credit to the $1$-gram supermarket.
-Although supermarket does not deserve the full creditof $1$ given to store by
-BLEU, it seems harsh to give it no credit at all.
-Word2vec might place supermarket in a neighborhood of store where the two
-words have vectors that have a distance of $0.2$ from each other.
-Our algorithm would assign $0.8$ ( $1-0.2$) instead of $0$ to the word supermarket.
-We do this until we find a match for a small number ($k=3$) of words in a
-neighborhood of the $1$-gram in the reference $1$-gram.
-For $n$-grams with $n>1$ the algorithm is slightly more complicated.
-We first discard decoder output $n$-grams that differ by more than a single
-word.
-Then we consider the $n$-grams that result by replacing the word that differs
-with words close to it as above. Again
-we do this up to $k=3$ times for the top $k$ words that appear in the
-neighborhood of the differing word in the reference transcription.
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../2014_bleu"
