@@ -1,5 +1,4 @@
 import sys
-import re
 import string
 from gensim.models.word2vec import Word2Vec as w2v
 

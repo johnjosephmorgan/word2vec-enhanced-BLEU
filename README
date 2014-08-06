@@ -1,0 +1,43 @@
+Intelligent BLEU Usage
+
+Pre-Requisites
+    Tested on Python 2.7.x, should work on any Python 2.6+ but not Python 3
+    gensim
+        Install this with pip or easy_install
+        Requires numpy, scipy, and cython. Install those with pip or easy_install as well
+    Semi-optional: word2vec
+        Execute the command "svn checkout http://word2vec.googlecode.com/sv/trunk/"
+        Run "make" to compile the tools
+        Code can be gotten from http://code.google.com/p/word2vec if the above cannot be done. Use make to build
+        The set-up below assumes you get word2vec. However, the vector files can be created by gensim
+
+Set-up
+    Create a vector file
+        Get a data set in a form useable by the word2vec software
+            All punctuation must be removed
+            All newlines must also be removed
+            Capital letters should be downcased
+            Numerals should be converted to their names (1 -> one, etc.)
+        Run the following command to generate the file vectors.bin, replacing [DATASET] with your data set name
+            word2vec -train [DATASET] -output vectors.bin -binary 1 -cbow 0 -size 200 -window 5 -negative 0 -hs 1 -sample 1e-3
+        Adjust the parameters in the above to suit your data, documentation is provided by running word2vec with no arguments
+        If you are unable to use word2vec, gensim can be used to generate a vector file
+            In Python, import gensim.models.word2vec and use the Word2Vec class to train a vector file on a data set
+    Create file to be scored
+        Somehow generate a file containing translated sentences with an arbitrary number of references in the following format:
+            "output ||| ref1 ||| ref2 ..."
+        Fields are separated by ||| and there is one sentence per line.
+        The first field on each line is the translation output, each subsequent field is taken to be a reference
+
+Running
+    Run the following command, replacing [TESTFILE] with the name of your file to score
+        python intelligent-bleu.py vectors.bin [TESTFILE]
+    The following additional parameters can be added
+        -n precision, the maximum precision to test
+        -a alternates, the number of alternates to find for each word
+        -t threshold, the minimum similarity between words that are replaced
+    The output will be the score for each level of precision, following by the final score, which is the geometric mean of the precisions
+
+Importing as a Module
+    The intelligent-bleu script can also be connected to as a module
+    The bleu() function is exposed and can be used to compute a sentence-level BLEU score
