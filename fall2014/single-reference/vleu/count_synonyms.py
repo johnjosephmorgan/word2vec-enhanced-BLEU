@@ -1,23 +1,40 @@
 from collections import Counter
+import numpy as np
 import sys
 
-from ngrams import ngrams
-from gensim.models.word2vec import Word2Vec as w2v
+from gensim import utils, matutils 
+from gensim.models.word2vec import Word2Vec
+from ngram_list import ngram_list
 
 
-def count_synonyms(system, reference, model, n):
-    ng_sys = ngrams(system, n)
+def n_similarity(model, ws1, ws2):
+    v1 = [model[word] for word in ws1]
+    v2 = [model[word] for word in ws2]
+    return np.dot(matutils.unitvec(np.array(v1).mean(axis=0)), matutils.unitvec(np.array(v2).mean(axis=0)))
+
+
+
+
+def count_synonyms(system, reference, model, n, threshold=0.5):
     counts = Counter()
+    ng_sys = ngram_list(system, n)
     for ww in ng_sys:
-        ng_refs = ngrams(str(reference).split(), n)
+        ng_refs = ngram_list(reference, n)
         if ww in ng_refs:
-            counts[ww] = ng_refs[ww]
+            counts[str(ww)] += 1
         else:
             try:
-                syn_ngrams = model.most_similar(positive=[ww], topn=10)
-                counts[ww] = syn_ngrams
+                for r_ng in ng_refs:
+                    if len(r_ng) == 1:
+                        syn = model.most_similar(positive=r_ng, topn=1)
+                        if syn[0][0] in ww:
+                            counts[str(ww)] += syn[0][1]
+                    elif len(r_ng) > 1:
+                        ng_similarity = n_similarity(model, ww, r_ng)
+                        if ng_similarity > threshold:
+                            counts[str(ww)] += ng_similarity
             except KeyError:
-                counts[ww] = 0
+                counts[str(ww)] += 0
 
     return sum(counts.values())
 

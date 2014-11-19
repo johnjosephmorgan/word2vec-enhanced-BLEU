@@ -1,7 +1,7 @@
 from collections import Counter
 import sys
 
-from ngrams import ngrams
+from ngram_list import ngram_list
 
 
 def count_all_ngrams(n, reference):
@@ -9,10 +9,8 @@ def count_all_ngrams(n, reference):
     count total ngrams
     '''
     ngram_count = 0
-    for rr in reference:
-        ng_refs = ngrams(rr.split(), n)
-        ngram_count += len(ng_refs)
-
+    ng_refs = ngram_list(reference, n)
+    ngram_count += len(ng_refs)
     return ngram_count
 
 

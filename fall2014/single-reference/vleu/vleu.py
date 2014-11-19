@@ -21,5 +21,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     model = w2v.load_word2vec_format(fname=args.vectors, binary=True)
-
 print vleu(args.corpus, model, args.precision)
