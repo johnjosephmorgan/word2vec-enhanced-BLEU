@@ -1,14 +1,14 @@
 import argparse
 
 from gensim.models.word2vec import Word2Vec as w2v
-
+from gmean_synonym_precision import gmean_synonym_precision
 from log_synonym_precision import log_synonym_precision
 from brevity_penalty import brevity_penalty
 
 
 def vleu(corpus, model, n):
-    return log_synonym_precision(corpus, model, n) * brevity_penalty(corpus)
-
+    # return log_synonym_precision(corpus, model, n) * brevity_penalty(corpus)
+    return gmean_synonym_precision(corpus, model, n) * brevity_penalty(corpus)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Standard BLEU')

@@ -25,7 +25,7 @@ def brevity_penalty(corpus):
     else:
         bp = 1.0
 
-    return (-1.0) * bp
+    return bp
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
