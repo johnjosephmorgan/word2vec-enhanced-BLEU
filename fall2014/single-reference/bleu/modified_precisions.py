@@ -7,7 +7,7 @@ from count_all_ngrams import count_all_ngrams
 
 def modified_precisions(corpus, history):
     total_ngrams = Counter()
-    total_rel_ngrams = Counter()
+    relevant_ngrams = Counter()
     precisions = Counter()
 
     with open(corpus) as f:
@@ -17,12 +17,14 @@ def modified_precisions(corpus, history):
             sys_out = folds[0].split()
             for hh in range(1, int(history) + 1):
                 total_ngrams[hh] += count_all_ngrams(hh, ref)
-                total_rel_ngrams[hh] += count_matches(
-                    sys_out, ref, hh)
+                relevant_ngrams[hh] += count_matches(sys_out, ref, hh)
+    print 'relevant ngrams', relevant_ngrams
+    print 'total ngrams', total_ngrams
 
     for ii in range(1, int(history) + 1):
-        precisions[ii] = float(total_rel_ngrams[ii]) / float(total_ngrams[ii])
+        precisions[ii] = float(relevant_ngrams[ii]) / float(total_ngrams[ii])
 
+    print 'precisions', precisions
     return precisions
 
 if __name__ == '__main__':

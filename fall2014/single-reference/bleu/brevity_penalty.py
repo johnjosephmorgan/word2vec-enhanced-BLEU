@@ -6,8 +6,8 @@ import sys
 def brevity_penalty(corpus):
     systems = []
     references = []
-    r = 0
-    c = 0
+    r = 0.0
+    c = 0.0
     with open(corpus) as f:
         for line in f:
             folds = line.split("|||")
@@ -21,7 +21,7 @@ def brevity_penalty(corpus):
         c += len(cc)
 
     if c <= r:
-        bp = math.exp((1 - r) / c)
+        bp = math.exp(1 - ( float(r) / float(c)))
     else:
         bp = 1.0
 

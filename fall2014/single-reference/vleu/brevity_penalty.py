@@ -21,7 +21,7 @@ def brevity_penalty(corpus):
         c += len(cc)
 
     if c <= r:
-        bp = math.exp((1 - r) / c)
+        bp = math.exp(1 - ( float(r) / float(c)))
     else:
         bp = 1.0
 

@@ -1,12 +1,10 @@
 import argparse
 
-from gmean_modified_precision import gmean_modified_precision
-#from log_modified_precision import log_modified_precision
 from brevity_penalty import brevity_penalty
+from gmean_modified_precision import gmean_modified_precision
 
 
 def bleu(corpus, n):
-    # return log_modified_precision(corpus, n) * brevity_penalty(corpus)
     return gmean_modified_precision(corpus, n) * brevity_penalty(corpus)
 
 if __name__ == '__main__':
@@ -18,4 +16,6 @@ if __name__ == '__main__':
                         default=4, help='maximum precision')
     args = parser.parse_args()
 
-print bleu(args.corpus, args.precision)
+    b = bleu(args.corpus, args.precision)
+    print 'bleu', b
+

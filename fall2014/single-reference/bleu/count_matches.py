@@ -9,15 +9,12 @@ def count_matches(system, reference, n):
     given:
     word w from system output
     reference sentence r
-    find occurrences of w in r
+    find occurrence of w in r
     sum over all w
     '''
     counts = Counter()
-    ng_sys = ngram_list(system, n)
-    for ww in ng_sys:
-        counts = Counter()
-        ng_refs = ngram_list(reference, n)
-        if ww in ng_refs:
+    for ww in ngram_list(system, n):
+        if ww in ngram_list(reference, n):
             counts[str(ww)] += 1
         else:
             counts[str(ww)] += 0

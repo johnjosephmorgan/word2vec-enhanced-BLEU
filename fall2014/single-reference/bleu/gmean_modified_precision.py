@@ -1,8 +1,8 @@
 import sys
 
+from modified_precisions import modified_precisions
 import numpy as np
 from scipy.stats import gmean
-from modified_precisions import modified_precisions
 
 
 def gmean_modified_precision(corpus, history):
