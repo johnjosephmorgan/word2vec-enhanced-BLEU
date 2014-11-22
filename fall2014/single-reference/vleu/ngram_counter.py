@@ -7,7 +7,7 @@ def ngram_counter(sentence, n):
         % (str(type(sentence)), str(sentence))
     ngrams = Counter()
     for start in range(0, len(sentence) - n + 1):
-        ngrams[tuple(sentence[start:start + n])] += 1
+        ngrams[tuple(sentence[start:start + n])] += 1.0
 
     return ngrams
 

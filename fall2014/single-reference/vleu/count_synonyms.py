@@ -9,7 +9,6 @@ from ngram_counter import ngram_counter
 from ngram_list import ngram_list
 
 
-
 def n_similarity(model, ws1, ws2):
     v1 = [model[word] for word in ws1]
     v2 = [model[word] for word in ws2]
@@ -24,15 +23,21 @@ def count_synonyms(candidate, reference, model, n):
     for cand_ngram in ngram_list(candidate, n):
         if tuple(cand_ngram) in ng_refs.keys():
             matches += 1.0
-            del ng_refs[tuple(cand_ngram)]
+            ng_refs[tuple(cand_ngram)] -= 1.0
+            if ng_refs[tuple(cand_ngram)] == 0.0:
+                del ng_refs[tuple(cand_ngram)]
         elif tuple(cand_ngram) not in ng_refs.keys():
+            print 'candidate reference', tuple(cand_ngram), 'reference ngram keys', ng_refs.keys()
             try:
-                sims = []
+                sims = Counter()
                 for rr in ng_refs.keys():
-                    sims.append( n_similarity(model, cand_ngram, rr))
-                    if sims:
-                        matches += np.max(sims)
-                        del ng_refs[rr]
+                    sims[rr] =  n_similarity(model, cand_ngram, rr)
+                if sims:
+                    print cand_ngram, max(sims), 'max', np.max(sims.values())
+                    matches += np.max(sims.values())
+                    ng_refs[max(sims)] -= 1.0
+                    if ng_refs[max(sims)] == 0:
+                        del ng_refs[max(sims)]
             except KeyError:
                 matches += 0.0
 
