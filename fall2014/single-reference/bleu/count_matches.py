@@ -5,21 +5,16 @@ from ngram_list import ngram_list
 
 
 def count_matches(system, reference, n):
-    '''
-    given:
-    word w from system output
-    reference sentence r
-    find occurrence of w in r
-    sum over all w
-    '''
-    counts = Counter()
-    for ww in ngram_list(system, n):
-        if ww in ngram_list(reference, n):
-            counts[str(ww)] += 1
+    counts = 0.0
+    ng_refs = ngram_list(reference, n)
+    for cand in ngram_list(system, n):
+        if cand in ng_refs:
+            counts += 1.0
+            ng_refs.remove(cand)
         else:
-            counts[str(ww)] += 0
+            counts += 0.0
 
-    return sum(counts.values())
+    return counts
 
 
 if __name__ == '__main__':
