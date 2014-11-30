@@ -19,14 +19,22 @@ def synonym_precisions(corpus, model, history):
             sys_out = folds[0].split()
             ref = folds[1].strip("\n").split()
             for hh in range(1, int(history) + 1):
-                total_ngrams[hh] += count_all_ngrams(hh, ref)
-                relevant_ngrams[hh] += count_synonyms(sys_out, ref, model, hh)
-    print 'relevant ngrams', relevant_ngrams
-    print 'total ngrams', total_ngrams
+                if hh <= len(ref):
+                    total_ngrams[hh] += count_all_ngrams(hh, ref)
+                    relevant_ngrams[hh] += count_synonyms(
+                        sys_out, ref, model, hh)
+    for ii in  relevant_ngrams.values():
+        print ii,
+    print '	',
+    for ii in total_ngrams.values():
+        print ii,
+    print '	',
     for ii in range(1, int(history) + 1):
         precisions[ii] = float(relevant_ngrams[ii]) / float(total_ngrams[ii])
 
-    print 'precisions', precisions
+    for ii in precisions.values():
+        print ii,
+    print '	',
     return precisions
 
 if __name__ == '__main__':
