@@ -6,11 +6,12 @@ from gmean_synonym_precision import gmean_synonym_precision
 
 
 def vleu(corpus, model, n):
+    print 'VLEU	',
     return gmean_synonym_precision(corpus, model, n) * brevity_penalty(corpus)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Standard BLEU')
+        description='Vector BLEU. Add similar ngram matche scores to precision.')
     parser.add_argument('-C', '--corpus', required=True,
                         help='Corpus file')
     parser.add_argument('-V', '--vectors', required=True,
@@ -21,5 +22,4 @@ if __name__ == '__main__':
 
     model = w2v.load_word2vec_format(fname=args.vectors, binary=True)
     vb = vleu(args.corpus, model, args.precision)
-    print 'v bleu', vb
-
+    print vb
