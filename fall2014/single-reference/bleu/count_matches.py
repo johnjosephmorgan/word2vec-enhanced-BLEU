@@ -1,20 +1,23 @@
 from collections import Counter
 import sys
 
+from ngram_counter import ngram_counter
 from ngram_list import ngram_list
 
 
-def count_matches(system, reference, n):
-    counts = 0.0
-    ng_refs = ngram_list(reference, n)
-    for cand in ngram_list(system, n):
-        if cand in ng_refs:
-            counts += 1.0
-            ng_refs.remove(cand)
-        else:
-            counts += 0.0
+def count_matches(candidate, reference, n):
+    matches = 0.0
+    ng_refs = ngram_counter(reference, n)
+    for cand in ngram_list(candidate, n):
+        if tuple(cand )in ng_refs.keys():
+            matches += 1.0
+            ng_refs[tuple(cand)] -= 1.0
+            if ng_refs[tuple(cand)] == 0.0:
+                del ng_refs[tuple(cand)]
+        elif tuple(cand) not in ng_refs.keys():
+            matches += 0.0
 
-    return counts
+    return matches
 
 
 if __name__ == '__main__':
