@@ -1,0 +1,4 @@
+the boy drove to the store ||| the boy went to the store
+the boy ran to the store ||| the boy went to the store
+the boy walked to the store ||| the boy went to the store
+the boy walked to the supermarket ||| the boy went to the store

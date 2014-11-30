@@ -1,0 +1,224 @@
+a boy drove to a store
+a boy drove to a supermarket
+a boy drove to the store
+a boy drove to the supermarket
+a boy ran to a store
+a boy ran to a supermarket
+a boy ran to the store
+a boy ran to the supermarket
+a boy walked to a store
+a boy walked to a supermarket
+a boy walked to the store
+a boy walked to the supermarket
+a boy went to a store
+a boy went to a supermarket
+a boy went to the store
+a boy went to the supermarket
+a girl drove to a store
+a girl drove to a supermarket
+a girl drove to the store
+a girl drove to the supermarket
+a girl ran to a store
+a girl ran to a supermarket
+a girl ran to the store
+a girl ran to the supermarket
+a girl walked to a store
+a girl walked to a supermarket
+a girl walked to the store
+a girl walked to the supermarket
+a girl went to a store
+a girl went to a supermarket
+a girl went to the store
+a girl went to the supermarket
+a man drove to a store
+a man drove to a supermarket
+a man drove to the store
+a man drove to the supermarket
+a man ran to a store
+a man ran to a supermarket
+a man ran to the store
+a man ran to the supermarket
+a man walked to a store
+a man walked to a supermarket
+a man walked to the store
+a man walked to the supermarket
+a man went to a store
+a man went to a supermarket
+a man went to the store
+a man went to the supermarket
+a person drove to a store
+a person drove to a supermarket
+a person drove to the store
+a person drove to the supermarket
+a person ran to a store
+a person ran to a supermarket
+a person ran to the store
+a person ran to the supermarket
+a person walked to a store
+a person walked to a supermarket
+a person walked to the store
+a person walked to the supermarket
+a person went to a store
+a person went to a supermarket
+a person went to the store
+a person went to the supermarket
+a woman drove to a store
+a woman drove to a supermarket
+a woman drove to the store
+a woman drove to the supermarket
+a woman ran to a store
+a woman ran to a supermarket
+a woman ran to the store
+a woman ran to the supermarket
+a woman walked to a store
+a woman walked to a supermarket
+a woman walked to the store
+a woman walked to the supermarket
+a woman went to a store
+a woman went to a supermarket
+a woman went to the store
+a woman went to the supermarket
+he drove to a store
+he drove to a supermarket
+he drove to the store
+he drove to the supermarket
+he ran to a store
+he ran to a supermarket
+he ran to the store
+he ran to the supermarket
+he walked to a store
+he walked to a supermarket
+he walked to the store
+he walked to the supermarket
+he went to a store
+he went to a supermarket
+he went to the store
+he went to the supermarket
+she drove to a store
+she drove to a supermarket
+she drove to the store
+she drove to the supermarket
+she ran to a store
+she ran to a supermarket
+she ran to the store
+she ran to the supermarket
+she walked to a store
+she walked to a supermarket
+she walked to the store
+she walked to the supermarket
+she went to a store
+she went to a supermarket
+she went to the store
+she went to the supermarket
+the boy drove to a store
+the boy drove to a supermarket
+the boy drove to the store
+the boy drove to the supermarket
+the boy ran to a store
+the boy ran to a supermarket
+the boy ran to the store
+the boy ran to the supermarket
+the boy walked to a store
+the boy walked to a supermarket
+the boy walked to the store
+the boy walked to the supermarket
+the boy went to a store
+the boy went to a supermarket
+the boy went to the store
+the boy went to the supermarket
+the girl drove to a store
+the girl drove to a supermarket
+the girl drove to the store
+the girl drove to the supermarket
+the girl ran to a store
+the girl ran to a supermarket
+the girl ran to the store
+the girl ran to the supermarket
+the girl walked to a store
+the girl walked to a supermarket
+the girl walked to the store
+the girl walked to the supermarket
+the girl went to a store
+the girl went to a supermarket
+the girl went to the store
+the girl went to the supermarket
+the man drove to a store
+the man drove to a supermarket
+the man drove to the store
+the man drove to the supermarket
+the man ran to a store
+the man ran to a supermarket
+the man ran to the store
+the man ran to the supermarket
+the man walked to a store
+the man walked to a supermarket
+the man walked to the store
+the man walked to the supermarket
+the man went to a store
+the man went to a supermarket
+the man went to the store
+the man went to the supermarket
+the person drove to a store
+the person drove to a supermarket
+the person drove to the store
+the person drove to the supermarket
+the person ran to a store
+the person ran to a supermarket
+the person ran to the store
+the person ran to the supermarket
+the person walked to a store
+the person walked to a supermarket
+the person walked to the store
+the person walked to the supermarket
+the person went to a store
+the person went to a supermarket
+the person went to the store
+the person went to the supermarket
+the woman drove to a store
+the woman drove to a supermarket
+the woman drove to the store
+the woman drove to the supermarket
+the woman ran to a store
+the woman ran to a supermarket
+the woman ran to the store
+the woman ran to the supermarket
+the woman walked to a store
+the woman walked to a supermarket
+the woman walked to the store
+the woman walked to the supermarket
+the woman went to a store
+the woman went to a supermarket
+the woman went to the store
+the woman went to the supermarket
+they drove to a store
+they drove to a supermarket
+they drove to the store
+they drove to the supermarket
+they ran to a store
+they ran to a supermarket
+they ran to the store
+they ran to the supermarket
+they walked to a store
+they walked to a supermarket
+they walked to the store
+they walked to the supermarket
+they went to a store
+they went to a supermarket
+they went to the store
+they went to the supermarket
+we drove to a store
+we drove to a supermarket
+we drove to the store
+we drove to the supermarket
+we ran to a store
+we ran to a supermarket
+we ran to the store
+we ran to the supermarket
+we walked to a store
+we walked to a supermarket
+we walked to the store
+we walked to the supermarket
+we went to a store
+we went to a supermarket
+we went to the store
+we went to the supermarket
