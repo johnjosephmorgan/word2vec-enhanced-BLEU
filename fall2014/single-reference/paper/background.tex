@@ -1,0 +1,87 @@
+
+\section{Background}
+\label{sec:background}
+
+\subsection{Previous Work}
+\label{sec:prevwork}
+
+
+\subsubsection{BLEU}
+\label{sec:bleu}
+
+
+Advantages
+quick
+inexpensive
+language-independent
+correlates highly with human evaluation
+has little marginal cost per run
+Best at parameter optimization
+BLEU is well known to have weaknesses. 
+Work has been done to remedy these weaknesses by incorporating llinguistic features into the evaluation metric. 
+These enhancements make the metrics more accurate and correlate more with human judgements.
+Precision and Recall
+Bleu computes precision for ngrams matches for n between 1 and 4. 
+
+\subsubsection{METEOR}
+\label{sec:meteor}
+
+
+Meteor is an evaluation metric that takes into consideration stem, synonym, and paraphrase matches between words inaddition to exact string matches.
+Enhancements:
+Porter Stemming.
+Words  are determined to  be synonyms if they share a synset in Wordnet. 
+Function word discounting.
+
+These enhancements yielded improvements over bleu, but they are language dependent. 
+later versions have incorporated methods for adapting METEOR to new languages. 
+Meteor extends BLEU by incorporating semantic features into the evaluation of SMT output. 
+We similarly enhance BLEU with semantic knowledge by replacing words in the reference transcriptions with words that are close in meaning.
+
+\subsubsection{TERP}
+\label{sec:terp}
+
+
+TERP builds on Translation Edit Rate (TER), which is a metric that uses the minimum edit distance to score translations. 
+TERP inherits the two stemming and synonym enhancements from meteor. 
+TERP takes a step up from comparing words with equivalent meaning    (synonyms) to comparing phrases with equivalent meaning (paraphrases). 
+TERP is also grounded in human judgements. 
+The scoring function parameters, that is, the weights associated with the diffferent edit operations, are optimized  to correlate with the  editing operations performed by humans. 
+TERP also produces as a byproduct an alignment between the hypothesis and reference. 
+
+\subsubsection{HyTER}
+\label{sec:hyter}
+
+
+Dreyer and Marcu's work  on HyTER  solves the reference posity problem by employing human annotators to write alternative translations for phrases. 
+The phrases are compiled into Recursive Transition Networks that encode an exponential number of reference sentences. 
+It has been shown that HyTER is better at differentiating human from machine translation than bleu, terp, and meteor. 
+HyTER also ranks machine translation systems performance better than these metrics, where the correct ranking is given by human judgements. 
+HyTER also outperforms the other automatic methods as corpus size decreases   from document to sentence. 
+In summary, HyTER has clear advantages over other automatic metrics. 
+However,   HyTER has one disadvantage we want to avoid. 
+The process of creating the meaning equivalent networks used by HyTER requires a prohibitively large amount of human labor. 
+
+We provide background on the method of semantic vector spaces, distributional representation semantics, and deep learning that we rely on to obtain word synonyms and meaning equivalent phrases and sentences. 
+We devote a section to our method incorporating synonyms into bleu. 
+We discuss our methods for scoring phrases and sentences in two sections. 
+Distributional Representational Semantics
+We use the Word2vec  tool. 
+The modification will consist of  passing the system hypothesis through word2vec to generate candidate synonyms together with smoothing factors.
+We will also use this method to generate reference sentences with similar meaning to a given reference sentence.
+The word2vec tool is used to build a vector space word distribution model of the target language. 
+Then a distance function defined in the vector space is used to generate a neighborhood of words that are close to the words in the reference transcriptions. 
+Word2vec only has one language-dependent requirement:a large monolingual corpus of text. 
+It does not require a parser, a stemmer, or a part of speech tagger. 
+The representations of words are learned using the distributed Skip-gram or Continuous Bag-of-Words (CBOW) models recently proposed by Mikolov. 
+These models learn word representations using a neural network architecture that predicts the neighbors of a word.
+We embedd  a large text corpus in the target language into a vector space using either the cbow or skipgram neural network. 
+This embedding gives us two methods that we can use for improving bleu scores. 
+We can measure the distance between word vectors. 
+We can generate a list of the closest word vectors to a given word vector. 
+We will explain how we use these methods in the next section. 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ling848fall2014"
+%%% End: 

@@ -1,0 +1,29 @@
+
+\section{Discussion}
+\label{sec:discuss}
+
+Bleu is a precision metric. 
+Consider the following candidate/reference pair:
+the the the the the the the 
+the cat on the mat
+We call this the  the overgeneration problem (the two the tokens are not a typo)
+We handle this problem by removing a the in the reference each time it is matched . 
+This takes care of the the overgeneration problem in the standard bleu metric. 
+The the overgeneration problem remains in our method. 
+Consider the candidate reference pair:
+The price for the weapon I learned there
+I found out the price of the weapon only there
+The word ``for'' does not appear in the reference. 
+Our method obtains similarity scores between ``for'' and each word in the reference that has not been mathced yet. 
+Unfortunately, the word with highest similarity to ``for'' is ``there. 
+``there" is chosen as the match for ``for'' and is removed from the referenced word list. 
+When we later try to find a match for ``there'' an exact match is not made. 
+In this case the standard BLEU metric assigns a higher score to the candidate than our method. 
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ling848fall2014"
+%%% End: 

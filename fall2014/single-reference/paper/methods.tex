@@ -1,0 +1,82 @@
+
+\section{Methods}
+\label{sec:methods}
+
+
+%There are several approaches we consider. 
+
+We propose four methods that we group into 2 major classes: segment methods and hierarchical methods. 
+We subdivide the segment methods into word-level methods and phrase-level methods. 
+There are two features of semantic vector space embeddings that we use to design our methods. 
+The vector space embeddings come with an associated similarity measure. 
+The methods that use this feature we will call similarity methods. 
+The vector space embeddings can also be used to generate a list of vectors in a neighborhood of a given vector. 
+The vectors in the neighborhood can be ranked by their distance to the given vector. 
+We use this feature to generate extra references for a  given reference.
+Methods that use this feature we will call generration methods. 
+%Word Level
+%
+%The bleu algorithm loops over the ngrams in the system output and the reference transcriptions. 
+%A match count is accumulated for the precision computation. 
+%A one is added to the count if the system and reference ngrams match and a zero is added otherwise. 
+%The simplest of our approaches computes the similarity between the system output and reference words and adds this number instead of a one or a zero to the match count used in the precision calculation. 
+%Another  approach works by starting with words or phrases from MT system output and a list of synonyms or meaning equivalent phrases are produced together with the distances between them. 
+%If one of these synonyms matches the reference word being considered then its associated distance is added in the precision computation . 
+%A third approach works similarly but instead  starts with words and phrases extracted from a reference translation and a list of its closest synonyms or meaning equivalent phrases are produced. 
+%If one of these synonyms matches the system output word being considered then it is added in the precision computation weighted by its associated distance. 
+%Next we discuss the method we use to obtain synonyms and how we can measure synonomy. 
+
+%The traditional BLEU metric measures the overlap of n-grams from the decoder output with n-grams from the reference corpus sentences. 
+%Credit is given to the decoder output n-gram only when there is an exact string to string match. 
+%If the reference sentence was:
+%The boy went to the store
+%But the decoder output:
+%The boy went to the supermarket
+%BLEU would assign no credit to the 1-gram supermarket. 
+%Although supermarket does not deserve the full creditof 1 given to store by BLEU, it seems harsh to give it no credit at all. 
+%Word2vec might place supermarket in a neighborhood of store where the two words have vectors that have a cosine angle of 0.2 between each other. 
+%Our algorithm would assign 0.2 instead of 0 to the word supermarket.
+%We do this until we find a match for a small number (k = 3) of words in a neighborhood of the 1-gram in the reference 1-gram. For n-grams with n > 1 the
+%algorithm is slightly more complicated. 
+%We first discard decoder output n-grams that differ by more than a single word. 
+%Then we consider the n-grams that result by replacing the word that differs with words close to it as above. 
+%Again we do this up to k = 3 times for the top k words that appear in the neighborhood of the differing word in the reference transcription.
+
+Our simplest method only differs from BLEU in the precision computation for $1$grams. 
+When a candidate $1$gram does not match any $1$gram in the reference, we compute the similarities with each of the remaining $1$grams in the reference. 
+Instead of adding $0$ to our match count, we add the maximum of these similarities. 
+We then remove one instance of the $1$gram that yielded the maximum similarity. 
+This step of removing the argmax $1$gram is done to mitigate the overgeneration problem. 
+In the discussion section we consider a problem that this step causes and for which we do not yet have a solution. 
+
+We consider the $1$gram case separately, because it has a stronger theoretical basis. 
+The similarities are given to us by word2vec. 
+The vector space embedding performed by word2vecd operates on $1$grams. 
+Similarities for higher $n$grams are computed and we exploit this later in our phrase-level method, but we see this as having weaker theoretical foundations. 
+
+%We do this until we find a match for a small number (k = 3) of words in a neighborhood of the 1-gram in the reference 1-gram. 
+%For n-grams with n > 1 the algorithm is slightly more complicated. 
+%We first discard decoder output n-grams that differ by more than a single word. 
+%Then we consider the n-grams that result by replacing the word that differs with words close to it as above. 
+%Again we do this up to k = 3 times for the top k words that appear in the neighborhood of the differing word in the reference transcription.
+
+% Phrase Level
+% Sentence Level
+%We will use the Socher and Iyyer composition methods to generate candidate ngrams of higher order that aare similar in meaning to the system output. 
+
+
+\subsection{Data}
+\label{sec:data}
+
+We test the metrics on the WMT13 corpus. 
+This corpus consists of $3000$ segment pairs. 
+Each pair consists of a system output and one reference. 
+The system output has 55786 tokens
+The reference has 56089 tokens. 
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ling848fall2014"
+%%% End: 
