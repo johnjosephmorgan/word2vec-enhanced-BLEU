@@ -20,9 +20,30 @@ Unfortunately, the word with highest similarity to ``for'' is ``there.
 When we later try to find a match for ``there'' an exact match is not made. 
 In this case the standard BLEU metric assigns a higher score to the candidate than our method. 
 
+The xleu metric assigns a perfect match to the following pair of $4$-grams. 
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|}
+    candidate & reference & similarity \\
+the woman drove around & woman drove around the & 1.0 
+  \end{tabular}
+  \caption{XLEU assigns a perfect match to this pair of $4$-grams.}
+  \label{tab:perfect}
+\end{table}
 
+This is a problem. 
+The metric is assigning perfect scores to $n$-grams that are  badly oredered. 
+If the system and reference have the same words in differeent oreders a perfect score is assigned to the $n$-gram.
 
-
+The following is a good score assignment by XLEU.
+\begin{table}[hh]
+  \centering
+  \begin{tabular}{|c|c|c||c|c|c|}
+    drove around the store & went around the store & 0.93 
+  \end{tabular}
+  \caption{A good score assignment by XLEU.}
+  \label{tab:good}
+\end{table}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "ling848fall2014"
