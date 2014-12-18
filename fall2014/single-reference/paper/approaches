@@ -1,0 +1,23 @@
+graph approaches {
+a [label="approaches"];
+h [label="hierarchical"];
+t [label="segment"];
+sh [label="sim"];
+sw [label="sim";]
+sp [label="sim";]
+gh [label="gen"];
+gw [label="gen"];
+gp [label="gen"];
+p [label="phrase"];
+w [label="word"];
+c [label="scalar"];
+v [label="vector"];
+x [label="cross"];
+a -- h -- sh;
+a -- h -- gh;
+a -- t -- w -- sw -- c
+a -- t -- w -- gw
+a -- t -- p -- gp
+a -- t -- p -- sp -- v
+a -- t -- p -- sp -- x
+}
