@@ -42,9 +42,9 @@ grammar = parse_cfg(
     Det -> 'a'
     Pro -> 'he' | 'she' | 'they' | 'we'
     N -> 'man' | 'boy' | 'person' | 'woman' | 'girl'
-    N_PP -> 'store' | 'supermarket'
+    N_PP -> 'store' | 'supermarket' | 'mall'
     V -> 'went' | 'walked' | 'drove' | 'ran'
-    P -> 'to'
+    P -> 'to' | 'by' | 'around'
     """)
 
 for sent in generate(grammar):
