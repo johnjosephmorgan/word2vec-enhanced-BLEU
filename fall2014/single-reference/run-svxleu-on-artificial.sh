@@ -30,7 +30,13 @@ python \
 svxleu/svxleu.py \
 -C data/eval_artificial.txt \
 -V ./GoogleNews-vectors-negative300.bin.gz \
+-t 0.85 \
 > scores/svxleu-artificial.txt
+
+python \
+bleu/bleu.py \
+-C data/eval_artificial.txt \
+> scores/bleu-artificial.txt
 
 
 scripts/multi-bleu.perl \
