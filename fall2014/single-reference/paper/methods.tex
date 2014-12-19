@@ -15,9 +15,9 @@
 %We use this feature to generate extra references for a  given reference.
 %Methods that use this feature we will call generation methods. 
 
-Before we describe the methods we used in this work, we give a classification of the approaches that could be used to attack the pocity of references problem. 
+Before we describe the methods we used in this work, we give a classification of the approaches that could be used to attack the paucity of references problem. 
 We group the approaches into 2 major classes: segment methods and hierarchical methods.
-The hierarchical methods use a parse tree to compose word vectors into phrase vectors and phrase vectors into sentence vectors. 
+The hierarchical methods use a parse tree to assemble word vectors into phrase vectors and phrase vectors into sentence vectors. 
 We will not deal with hierarchical approaches in this paper. 
 We subdivide the segment approaches into word-level methods and phrase-level methods. 
 Each of these approaches can be further  classified into two more classes depending on how we use the vector space embedding. 
@@ -37,14 +37,14 @@ VLEU and XLEU are phrase similarity metrics.
 
 %Word Level
 %
-%The bleu algorithm loops over the ngrams in the system output and the reference transcriptions. 
+%The bleu algorithm loops over the $n$-grams in the system output and the reference transcriptions. 
 %A match count is accumulated for the precision computation. 
-%A one is added to the count if the system and reference ngrams match and a zero is added otherwise. 
+%A one is added to the count if the system and reference $n$-grams match and a zero is added otherwise. 
 %The simplest of our approaches computes the similarity between the system output and reference words and adds this number instead of a one or a zero to the match count used in the precision calculation. 
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth,height=2.0181in]{approaches.pdf}
+  \includegraphics[width=2.0\linewidth,height=4.0181in]{approaches.pdf}
   \caption{Possible approaches for incorporating semantic vectors into an evaluation metric.}
   \label{fig:approaches}
 \end{figure}
@@ -52,11 +52,17 @@ VLEU and XLEU are phrase similarity metrics.
 
 The BLEU algorithm loops over the ngrams in the system output and the reference transcriptions. 
 A match count is accumulated for each of the four precision computations. 
-A one is added to the count if the system and reference ngrams match and a zero is added otherwise. 
+A $1$ is added to the count if the system and reference $n$-grams match and a $0$ is added otherwise. 
 All three methods, SLEU, VLEU, and XLEU compute the similarity between the system output and reference $n$grams and adds this number instead of a $1$ or a $0$ to the match count used in the precision calculation. 
-SLEU only adds similarity scores for $1$grams. 
-VLEU adds similarity scores for $1$ to $1$, $2$ to $2$, $3$ to $3$,  and $4$ to $4$ grams. 
-XLEU adds similarity scores for $1$ to $1$, $2$ , $3$, and $4$-grams, $2$ to $1$, $2$, $3$, and $4$-grams, $3$ to $1$, $2$, $3$, $4$- grams, and $4$ to $1$, $2$, $3$, $4$-grams. 
+SLEU only adds similarity scores for $1$-grams. 
+VLEU adds similarity scores for $1$ to $1$, $2$ to $2$, $3$ to $3$,  and $4$ to $4$-grams. 
+XLEU adds similarity scores for $1$ to $1$, $2$ , $3$, and $4$-grams, $2$ to $1$, $2$, $3$, and $4$-grams, $3$ to $1$, $2$, $3$, and $4$- grams, and $4$ to $1$, $2$, $3$, and $4$-grams. 
+%In the XLEU case, should we compute similarities with the remaining reference ngrams or all the ngrams? 
+In the XLEU case, we compute similarities with the remaining reference $n$-grams. 
+That is, we do not consider the similarity between non-exact candidate $j$-grams and reference $k$-grams that have already been matched exactly. 
+Unless the candidate $j$-gram occurrs several times in the reference. 
+Note that -- as in the case for scalar and vector BLEU -- each time a candidate $j$-gram matches a reference $k$-gram, the count of reference $k$-grams is decremented by its similarity to the candidate $j$-gram. 
+If this count falls below $0$ it is removed from the references. 
 
 %Another  approach works by starting with words or phrases from MT system output and a list of synonyms or meaning equivalent phrases are produced together with the distances between them. 
 %If one of these synonyms matches the reference word being considered then its associated distance is added in the precision computation . 
@@ -81,30 +87,38 @@ XLEU adds similarity scores for $1$ to $1$, $2$ , $3$, and $4$-grams, $2$ to $1$
 %Again we do this up to k = 3 times for the top k words that appear in the neighborhood of the differing word in the reference transcription.
 
 Our simplest method, SLEU,  only differs from BLEU in the precision computation for $1$grams. 
-When a candidate $1$gram does not match any $1$gram in the reference, we compute the similarities with each of the remaining $1$grams in the reference. 
+When a candidate $1$-gram does not match any $1$-gram in the reference, we compute the similarities with each of the remaining $1$-grams in the reference. 
 Instead of adding $0$ to our match count, we add the maximum of these similarities. 
-We then remove one instance of the $1$gram that yielded the maximum similarity. 
-This step of removing the argmax $1$gram is done to mitigate the overgeneration problem. 
+We then remove one instance of the $1$-gram that yielded the maximum similarity. 
+This step of removing the argmax $1$-gram is done to mitigate the overgeneration problem. 
 In the discussion section we consider a problem that this step causes and for which we do not yet have a solution. 
 
-We consider the $1$gram case separately, because it has a stronger theoretical basis. 
+We consider the $1$-gram case separately, because it has a stronger theoretical basis. 
 The similarities are given to us by word2vec. 
 We used the pre-trained vectors available for download on the word2vec webpage. 
-These aare $300$ dimensional vectors. 
-The vector space embedding performed by word2vecd operates on $1$grams. 
-Similarities for higher $n$grams are computed and we exploit this in our phrase-level methods, VLEU and XLEU, but we see this as having weaker theoretical foundations. 
+These are $300$ dimensional vectors. 
+The vector space embedding performed by word2vecd operates on $1$-grams. 
+Similarities for higher $n$-grams are computed and we exploit this in our phrase-level methods, VLEU and XLEU, but we see this as having weaker theoretical foundations. 
 
-VLEU is similar to SLEU; when a system output $n$gram does not match exactly with any reference $n$gram, its similarity with the remaining $n$grams is computed and the maximum of these similarities is added to the match count. 
+VLEU is similar to SLEU; when a system output $n$-gram does not match exactly with any reference $n$-gram, its similarity with the remaining $n$-grams is computed and the maximum of these similarities is added to the match count. 
 XLEU computes yet more similarities. 
-The similarity measure that operates on the embedded word vectors allows the similarity between $j$grams and $k$grams for $j$ different from $k$ to be computed. 
-For a non-exact matching $j$gram we compute similarities with $k$grams for $k$ between $1$ and $4$. 
+The similarity measure that operates on the embedded word vectors allows the similarity between $j$-grams and $k$-grams for $j$ different from $k$ to be computed. 
+For a non-exact matching $j$-gram we compute similarities with $k$-grams for $k$ between $1$ and $4$. 
 We add the maximum of these similarities to our match count. 
+
+%Note that when computing precision, we need to divide by the total number of possible matches. 
+%What is that number in the XLEU case?
+%If we compute similarities with all possible reference $n$grams and not just the ones remaining, we should divide by the total number of $n$grams. 
+%But if we only consider similarities with the remaining $n$grams it is not as clear what the denominator in the precision computation should be. 
+%All the $n$grams have a chance of matching or being similar to all the $n$grams. 
+%This makes a large difference in the final score. 
 
 Note that when computing precision, we need to divide by the total number of possible matches. 
 What is that number in the XLEU case?
-If we compute similarities with all possible reference $n$grams and not just the ones remaining, we should divide by the total number of $n$grams. 
-All the $n$grams have a chance of matching or being similar to all the $n$grams. 
-But if we only consider similarities with the remaining $n$grams it is not as clear what the denominator in the precision computation should be. 
+When computing $j$-BLEU or $j$-precision, All the $n$grams have a chance of matching or being similar to all the $j$-grams not only the $j$-grams. 
+So the denominator in the precision formula should be a count of the total number of $n$-grams. 
+This is different from the $j$-BLEU case. 
+When computing $j$-BLEU the denominator is a count of only the $j$-grams. 
 This makes a large difference in the final score. 
 
 %We do this until we find a match for a small number (k = 3) of words in a neighborhood of the 1-gram in the reference 1-gram. 
@@ -127,7 +141,17 @@ This makes a large difference in the final score.
 %The system output has 55786 tokens
 %The reference has 56089 tokens. 
 
-We test the metrics on three standard corpora and an artificial corpus.
+We tested the metrics on a standard corpus and an artificial corpus.
+After running the metrics on the WMT13 corpus, we found many spurious $n$-grams getting credit from the similarity score. 
+For example, we found that many non-exact matching candidate $n$-grams would achieve maximum similarity with the $1$-gram ``the''. 
+In order to investigate the cause of these problems, we wrote a script that generates sentences from a grammar. 
+We made the leaves of the grammar to be very similar so that we could generate sentences with similar meaning. 
+For example, for the noun constituent we used the words ``woman'', ``girl'', ``person'', ``boy'', and ``man''. 
+After generating a list of sentences, we split the list in two and pasted the two lists into a parallel corpus. 
+
+%The results of running the metrics on the artificial corpus indicated that high similarity values produced few spurious approximate matches. 
+%This observation led us to investigate the use of a similarity threshold. 
+%If the similarity score of a candidate reference $n$-gram pair is above a fixed number we consider it an approximate match and add it to the match count; otherwise we ignore it. 
 
 \subsubsection{Standard Corpora}
 \label{sec:standardcorp}
@@ -144,50 +168,34 @@ We wantted to create a corpus of segment pairs that were very close in meaning.
 
 \begin{table}[h]
   \centering
-  \begin{tabular}{|c|c|c|}
-    candidate & ||| & reference \\
+  \begin{tabular}{|c||c|}
 \hline
-the person went by the supermarket & ||| & a person ran to a store \\
-the girl ran by the store & ||| & we drove by the store \\
-the woman drove to a supermarket & ||| & a girl went around the store \\
-the girl drove to a mall & ||| & we went around the supermarket \\
-the girl ran to a mall & ||| & she ran to a supermarket \\
-a boy went by a supermarket & ||| & they walked by the mall \\
-the boy drove to the store & ||| & we ran by the supermarket \\
-the woman drove by a supermarket & ||| & a girl walked to a mall \\
-the woman ran around the mall & ||| & they went by the mall \\
-the person walked to a store & ||| & she walked around a mall \\
+    candidate & reference \\
+\hline
+the person went by the supermarket & a person ran to a store \\
+the girl ran by the store & we drove by the store \\
+the woman drove to a supermarket & a girl went around the store \\
+the girl drove to a mall & we went around the supermarket \\
+%the girl ran to a mall & ||| & she ran to a supermarket \\
+%a boy went by a supermarket & ||| & they walked by the mall \\
+%the boy drove to the store & ||| & we ran by the supermarket \\
+%the woman drove by a supermarket & ||| & a girl walked to a mall \\
+%the woman ran around the mall & ||| & they went by the mall \\
+%the person walked to a store & ||| & she walked around a mall \\
 \hline
   \end{tabular}
   \caption{Some examples of sentences from an artificial corpus.}
   \label{tab:sentencexamples}
 \end{table}
 
-\begin{table}
-  \centering
-  \begin{tabular}{|c|c|c|c|c|}
-\hline
-sleu & 1227.68 & 238.0 & 62.0 & 10.0 \\
-vleu& 1227.68 397.09 & 182.42 & 85.73 \\
-xleu	& 1052.11 & 632.47 & 437.74 & 283.26 \\
-\hline
-  \end{tabular}
-  \caption{Total number of $n$-grams in artificial corpus.}
-  \label{tab:artificialtotalngrams}
-\end{table}
-\begin{table}[h]
-  \centering
-  \begin{tabular}{|l||c|c|c|c|}
-    \hline
-metric & $1$-grams & $2$-grams & $3$-grams & $4$-grams \\
-BLEU SLEU VLEU & 56089 &  53089 & 50105 & 47138 \\
-XLEU & 159283 & 159267 & 159216 & 159060 \\
-\hline
-  \end{tabular}
-  \caption{Total $n$grams in the WMT13 corpus.}
-  \label{tab:totalngrams}
-\end{table}
+\subsection{Similarity Thresholding}
+\label{sec:simthresh}
 
+
+The results of running the metrics on the artificial corpus indicated that high similarity values were associated with few spurious approximate matches. 
+As similarity values decreased, more spurious approximate matches achieved the maximum similarity. 
+This observation led us to investigate the use of a similarity threshold. 
+If the similarity score of a candidate reference $n$-gram pair is above a fixed number we consider it an approximate match and add it to the match count, otherwise we ignore it. 
 
 %%% Local Variables: 
 %%% mode: latex

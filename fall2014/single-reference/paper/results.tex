@@ -2,37 +2,88 @@
 \section{Results}
 \label{sec:results}
 
+Table~\ref{tab:matchesandprecisionswmt13} shows that the total number of exact and approximate matched $n$-grams is very similar for the BLEU, SLEU, and VLEU metrics. 
+The totals for the XLEU metric are much largere. 
+
 \begin{table}[h]
   \centering
   \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 \hline
 \multicolumn{4}{c}{$n$-gram matches} & \multicolumn{4}{c}{precisions} \\
+\hline
 1 & 2 & 3 & 4 & 1 & 2 & 3 & 4 \\
+\hline
 BLEU & 27867 & 13406 & 7070 & 3853 & 0.50 & 0.25 & 0.14 & 0.08 \\
-SLEU & 27939.7 13406.0 & 7070.0 & 3853.0 & 0.50 & 0.25 & 0.14 & 0.08 \\
-VLEU & 27938.0 & 13489.3 & 7151.3 & 3912.4 & 0.50 & 0.25 & 0.14 & 0.08 \\
+SLEU & 27939.7 & 13406 & 7070 & 3853 & 0.50 & 0.25 & 0.14 & 0.08 \\
+VLEU & 27938 & 13489.3 & 7151.3 & 3912.4 & 0.50 & 0.25 & 0.14 & 0.08 \\
 XLEU & 48570.63 & 47512.57 & 39648.82 & 30769.48 & 0.30 & 0.30 & 0.25 & 0.19 \\
 \hline
   \end{tabular}
-  \caption{Matches and precisions.}
-  \label{tab:matches}
+  \caption{Matches and precisions on WMT13.}
+  \label{tab:matchesandprecisionswmt13}
 \end{table}
 
 
+%The precisions shown in table~\ref{tab:matchesandprecisionswmt13} and the scores shown table~\ref{tab:scores} are closer because the total number  of $n$-grams is much larger for XLEU. 
+
 \begin{table}[h]
   \centering
-  \begin{tabular}{|c|c|c|c||c|c|}
+  \begin{tabular}{|l||c|c|c|c|}
+    \hline
+metric & $1$-grams & $2$-grams & $3$-grams & $4$-grams \\
 \hline
-BLEU & 0.193981132795 \\
-SLEU & 0.194107449678 \\
-VLEU & 0.195708957845 \\
-XLEU & 0.255896029987 \\
+BLEU SLEU VLEU & 56089 &  53089 & 50105 & 47138 \\
+XLEU & 159283 & 159267 & 159216 & 159060 \\
+\hline
+  \end{tabular}
+  \caption{Total $n$-grams in the WMT13 corpus.}
+  \label{tab:totalwmt13ngrams}
+\end{table}
+
+\begin{table}
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+\hline
+sleu & 1227.68 & 238.0 & 62.0 & 10.0 \\
+vleu& 1227.68 & 397.09 & 182.42 & 85.73 \\
+%xleu	& 1052.11 & 632.47 & 437.74 & 283.26 \\
+\hline
+  \end{tabular}
+  \caption{Total number of $n$-grams in artificial corpus.}
+  \label{tab:artificialtotalngrams}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|}
+\hline
+metric & WMT13 & artificial \\
+\hline
+BLEU & 0.1940 & 0.0498 \\
+SLEU & 0.194107449678 & 0.0498 \\
+VLEU & 0.1957 & 0.0779 \\
+%XLEU & 0.255896029987 \\
 \hline
   \end{tabular}
   \caption{Scores.}
   \label{tab:scores}
 \end{table}
 
+\begin{table}
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+\hline
+metric & \multicolumn{3}{c}{score} \\
+ & \multicolumn{3}{c}{thresholds} \\
+ & 0.90 & 0.80 & 0.70 \\
+\hline
+SLEU & 0.1940 & & \\
+VLEU & 0.1941 & & \\
+xleu & 0.2074 & & \\
+      \end{tabular}
+  \caption{Scores by thresholdon WMT13.}
+  \label{tab:thresholded}
+\end{table}
 \subsection{Qualitative Results}
 \label{sec:qual}
 

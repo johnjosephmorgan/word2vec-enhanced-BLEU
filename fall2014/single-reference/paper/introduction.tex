@@ -2,10 +2,10 @@
 \label{sec:intro}
 
 
-\subsection{THE Pocity of References Problem}
-\label{sec:pocityprob}
+\subsection{The Paucity of References Problem}
+\label{sec:paucityprob}
 
-Naturally occurring sentences have billions of correct translations into one foreign language\cite{dreyer-marcu:2012:NAACL-HLT}. 
+Naturally occurring sentences can have billions of correct translations into one foreign language\cite{dreyer-marcu:2012:NAACL-HLT}. 
 By a correct translation of a source sentence we mean any sentence in the target language that has the same meaning as the source sentence. 
 The BLEU\cite{papineni-02} metric was designed assuming that the system output would be compared to a set of four reference translations. 
 In practice system developers rarely have access to more than one  reference translation. 
@@ -18,11 +18,17 @@ In this work we assume only one human generated reference is available.
 %Even with this partial credit assignment and assuming four references, it can hardly be claimed that this coverage is enough to be representative of billions of possible correct translations. 
 %A system can produce a perfectly adequate translation and get a very low BLEU score. 
 
-The main problem with BLEU caused by the pocity of references is that a system can produce a perfectly adequate translation and get a very low BLEU score. 
-The designers of BLEU were aware that input sentences could have many translations into a foreign language. 
-They incorporated features that capture variations of references. 
-Bleu does not require exact match for the entire sentence. 
-Instead, it allocates credit to sub-sentence segments by considering matches  of overlapping ngrams for   n equals 1 through 4.
+%The main problem with BLEU caused by the paucity of references is that a system can produce a perfectly adequate translation and get a very low BLEU score. 
+%The designers of BLEU were aware that input sentences could have many translations into a foreign language. 
+%They incorporated features that capture variations of references. 
+%Bleu does not require exact match for the entire sentence. 
+%Instead, it allocates credit to sub-sentence segments by considering matches  of overlapping ngrams for   n equals 1 through 4.
+%Even with this partial credit assignment and assuming four references,  this coverage is not enough to be representative of billions of possible correct translations. 
+
+The main problem with BLEU caused by the paucity of references is that a system can produce a perfectly adequate translation and get a very low BLEU score. 
+The designers of BLEU were aware that input sentences could have many translations into a foreign language, so they incorporated features that capture variations of references. 
+Bleu does not require an exact match for the entire sentence. 
+Instead, it allocates credit to sub-sentence segments by considering matches  of overlapping $n$-grams for   n equals 1 through 4.
 Even with this partial credit assignment and assuming four references,  this coverage is not enough to be representative of billions of possible correct translations. 
 
 \subsection{Improving BLEU}
@@ -36,13 +42,13 @@ Even with this partial credit assignment and assuming four references,  this cov
 
 %Making bleu better is a goal almost as old as BLEU itself. 
 %Several projects have been devoted to developing metrics that extend BLEU by expanding the set of references to include more sentences with equivalent meaning. 
-%Some of these projects like meteor\cite{banerjee-lavie:2005:MTSumm}\cite{denkowski:lavie:meteor-wmt:2014}, TERP\cite{snover-06}\cite{snover-08} and HyTER have produced successful metrics. 
+%Some of these projects like METEOR\cite{banerjee-lavie:2005:MTSumm}\cite{denkowski:lavie:meteor-wmt:2014}, TERP\cite{snover-06}\cite{snover-08} and HyTER have produced successful metrics. 
 %It is clear that an automatic method of generating synonyms and sentences with equivalent meaning will improve  BLEU. 
 
-Making bleu better is a goal almost as old as BLEU itself. 
+Making BLEU better is a goal almost as old as BLEU itself. 
 It became clear that  methods of generating synonyms and sentences with equivalent meaning would improve  BLEU. 
-Like our present project, several preevious projects have been devoted to developing metrics that extend BLEU by expanding the set of references to include more sentences with equivalent meaning. 
-Some of these projects like meteor\cite{banerjee-lavie:2005:MTSumm}\cite{denkowski:lavie:meteor-wmt:2014}, TERP\cite{snover-06}\cite{snover-08} and HyTER have produced successful metrics. 
+Like our present project, several previous projects have been devoted to developing metrics that extend BLEU by expanding the set of references to include more sentences with equivalent meaning. 
+Some of these projects like METEOR\cite{banerjee-lavie:2005:MTSumm}\cite{denkowski:lavie:meteor-wmt:2014}, TERP\cite{snover-06}\cite{snover-08} and HyTER have produced popular metrics. 
 
 
 We list some features we would like to see in an improved BLEU metric and some features we want to keep.  
@@ -70,16 +76,16 @@ Such systems need to measure the quality of partial inputs.
 \subsection{Word Similarities}
 \label{sec:wordsims}
 
-The ultimate goal of our project is to attack the pocity of references problem directly by using a semantic vector space to generate references equivalent to a single given reference. 
+The ultimate goal of our project is to attack the paucity of references problem directly by using a semantic vector space to generate references equivalent to a single given reference. 
 In this paper however, we investigate an easier solution. 
-We use the similarity measured defined in a semantic vector space generated by the tool word2vec to provide scores for $n$grams that do not have exact matches in the reference. 
-Word2vec embedds single word tokens into a vector space, so it makes sense to measure similarity between words in that space. 
-The word2vec developers suggest that the similarity function can be extended from words to phrases. 
+We use the similarity measure defined in a semantic vector space generated by the tool word2vec to provide scores for $n$grams that do not have exact matches in the reference. 
+Word2vec embeds single word tokens into a vector space, so it makes sense to measure similarity between words in that space. 
+The word2vec developers suggest that the similarity function can be extended from words to phrases by averaging vectors. 
 Although we do not believe that this is theoretically  well-founded, we take on their suggestion and build two enhanced BLEU metrics that compute similarities between phrases. 
 One of these metrics yields a significant boost in scores relative to BLEU. 
 Many $n$grams that did not match exactly receive a non-zero similarity measure with reference phrases. 
 However, an inspection of the matches indicates that a large portion of them are spurious. 
-We conclude that this is not an appropriate use of the similarity measure to provide approximate match scores for phrases. 
+We conclude that it is not an appropriate use of the similarity measure to provide approximate match scores for phrases. 
 We instead believe that more sophisticated approaches need to be taken to generate phrases with equivalent meaning to a given reference. 
 
 %Our first two methods use a semantic vector space representation for words.
