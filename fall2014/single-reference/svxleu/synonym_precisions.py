@@ -9,7 +9,7 @@ from count_x_synonyms import count_x_synonyms
 from count_all_ngrams import count_all_ngrams
 
 
-def synonym_precisions(corpus, model, history, m):
+def synonym_precisions(corpus, model, history, m, threshold):
     total_ngrams = Counter()
     relevant_ngrams = Counter()
     precisions = Counter()
@@ -25,13 +25,13 @@ def synonym_precisions(corpus, model, history, m):
                     total_ngrams[hh] += count_all_ngrams(hh, ref)
                     if m == 's':
                         relevant_ngrams[hh] += count_s_synonyms(
-                            sys_out, ref, model, hh)
+                            sys_out, ref, model, hh, threshold)
                     elif m == 'v':
                         relevant_ngrams[hh] += count_v_synonyms(
-                            sys_out, ref, model, hh)
+                            sys_out, ref, model, hh, threshold)
                     elif m == 'x':
                         relevant_ngrams[hh] += count_x_synonyms(
-                            sys_out, ref, model, hh)
+                            sys_out, ref, model, hh, history, threshold)
 
     for ii in relevant_ngrams.values():
         print ii,

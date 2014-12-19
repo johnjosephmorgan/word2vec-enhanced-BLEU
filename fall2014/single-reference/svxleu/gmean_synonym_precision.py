@@ -5,8 +5,8 @@ from scipy.stats import gmean
 from synonym_precisions import synonym_precisions
 
 
-def gmean_synonym_precision(corpus, model, history, m):
-    return gmean(synonym_precisions(corpus, model, history, m).values())
+def gmean_synonym_precision(corpus, model, history, m, threshold):
+    return gmean(synonym_precisions(corpus, model, history, m, threshold).values())
 
 
 if __name__ == '__main__':

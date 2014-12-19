@@ -8,9 +8,7 @@ import numpy as np
 from n_similarity import n_similarity
 
 
-
-
-def count_s_synonyms(candidate, reference, model, n):
+def count_s_synonyms(candidate, reference, model, n, threshold):
     matches = 0.0
     ng_refs = ngram_counter(reference, n)
     for cand in ngram_list(candidate, n):
@@ -26,11 +24,12 @@ def count_s_synonyms(candidate, reference, model, n):
                     for rr in ng_refs.keys():
                         sims[rr] = math.fabs(n_similarity(model, cand, rr))
                     if sims:
-                        matches += np.max(sims.values())
+                        if float(np.max(sims.values())) > float(threshold):
+                            matches += np.max(sims.values())
 
-                        ng_refs[max(sims)] -= sims[rr]
-                        if ng_refs[max(sims)] == 0.0:
-                            del ng_refs[max(sims)]
+                            ng_refs[max(sims)] -= sims[rr]
+                            if ng_refs[max(sims)] == 0.0:
+                                del ng_refs[max(sims)]
                 except KeyError:
                     matches += 0.0
             elif            n > 1:
