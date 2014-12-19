@@ -26,18 +26,23 @@ def count_synonyms(candidate, reference, model, n):
             try:
                 sims = Counter()
                 for ii in range(1, n + 1):
-                    ngrs = ngram_counter(reference, ii)
-                    for rr in ngrs.keys():
+                    # ngrs = ngram_counter(reference, ii)
+                    # for rr in ngrs.keys():
+                    for rr in ng_refs.keys():
                         if rr:
-                            sims[rr] = math.fabs(n_similarity(model, cand, rr))
+                            # sims[rr] = math.fabs(n_similarity(model, cand, rr))
+                            sims[rr] = n_similarity(model, cand, rr)
                         if sims:
                             matches += np.max(sims.values())
                             logging.info(
-                                'candidate %s reference %s similarity%f',\
-                                cand, rr, sims[rr])
-                            ngrs[max(sims)] -= sims[rr]
-                            if ngrs[max(sims)] <= 0.0:
-                                del ngrs[max(sims)]
+                                '%s	%s	%f',\
+                                cand, max(sims), sims[rr])
+                            # ngrs[max(sims)] -= sims[rr]
+                            ng_refs[max(sims)] -= sims[rr]
+                            # if ngrs[max(sims)] <= 0.0:
+                            if ng_refs[max(sims)] <= 0.0:
+                                # del ngrs[max(sims)]
+                                del ng_refs[max(sims)]
             except KeyError:
                 matches += 0.0
 
