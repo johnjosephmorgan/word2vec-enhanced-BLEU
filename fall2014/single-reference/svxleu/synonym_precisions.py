@@ -1,5 +1,5 @@
+import argparse
 from collections import Counter
-import sys
 
 from gensim.models.word2vec import Word2Vec as w2v
 
@@ -48,12 +48,20 @@ def synonym_precisions(corpus, model, history, m, threshold):
     return precisions
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
-        print 'USAGE: synonym_precisions.py CORPUS MODEL HISTORY METRIC'
-        exit()
+    parser = argparse.ArgumentParser(
+        description='compute precisions')
+    parser.add_argument('-C', '--corpus', required=True,
+                        help='Corpus file')
+    parser.add_argument('-V', '--vectors', required=True,
+                        help='Vectors file')
+    parser.add_argument('-p', '--precision', metavar='int',
+                        default=4, help='maximum precision')
+    parser.add_argument('-t', '--threshold', type=float,
+                        default=0.7, help='Similarity threshold. Only ngram pairs with similarity exceeding this threshold will be counted.')
+    parser.add_argument('-e', '--metric', required=True,
+                        help='metric')
 
-    corpus = sys.argv[1]
-    model = sys.argv[2]
-    history = int(sys.argv[3])
-    m = sys.argv[4]
-    print synonym_precisions(corpus, model, history, m)
+    args = parser.parse_args()
+    model = w2v.load_word2vec_format(fname=args.vectors, binary=True)
+    print synonym_precisions(
+        args.corpus, model, args.precision, args.metric, args.threshold)
