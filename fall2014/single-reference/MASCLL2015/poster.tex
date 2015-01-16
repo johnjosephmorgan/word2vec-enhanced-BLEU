@@ -1,0 +1,66 @@
+\documentclass[final]{beamer}
+  \mode<presentation>
+  {
+% you can chose your theme here:
+\usetheme{Berlin}
+% further beamerposter themes are available at 
+% http://www-i6.informatik.rwth-aachen.de/~dreuw/latexbeamerposter.php
+}
+  \usepackage{type1cm}
+  \usepackage{calc} 
+  \usepackage{times}
+  \usepackage{amsmath,amsthm, amssymb, latexsym}
+  \boldmath
+  \usepackage[english]{babel}
+  \usepackage[latin1]{inputenc}
+  \usepackage[orientation=portrait,size=a0,scale=1.4,debug]{beamerposter}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+%\usepackage{algpseudocode}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{subfigure}
+
+  \graphicspath{{figures/}}
+  \title[Word2vec BLEU]{Word2vec Enhanced BLEU}
+  \author[Morgan]{John Morgan}
+  \institute[UMD]{University of Maryland}
+  \date{}
+\newcommand{\TableSmall}[4]{%
+  \begin{table}
+    \begin{scriptsize}
+    \begin{centering}
+    \begin{tabular}{#3}
+      #4
+    \end{tabular}
+    \end{centering}
+    \end{scriptsize}
+    \caption{#2}
+    \label{tab:#1}
+  \end{table}}
+
+\begin{document}
+\begin{frame}{}
+\vfill
+\begin{beamercolorbox}{}
+\maketitle
+\end{beamercolorbox}
+  \vskip -1.1in
+\begin{columns}[t]
+\begin{column}{.32\linewidth}
+\input{01}
+\end{column}
+\begin{column}{.33\linewidth}
+\end{column}
+\begin{column}{.35\linewidth}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End: 
