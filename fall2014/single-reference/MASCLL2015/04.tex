@@ -1,0 +1,27 @@
+\begin{block}{Thresholding}
+\begin{description}
+\item[Why Threshold?] \hfill \\
+\begin{itemize}
+\item 
+many non-exact matches get non-zero similarity  
+\item 
+large portion of matches are spurious
+\end{itemize}
+\end{description}
+\TableSmall{threshold}{%
+Scores by metrics at different thresholds.
+}{|l|c|c|c|c|c|}{%
+\hline
+metric & 0 & 70 & 80 & 90 & 95 \\
+S BLEU & 19.41 & 19.40 & 19.40 & 19.40 & 19.40 \\
+V BLEU & 19.57 & 19.51 & 19.47 & 19.41 & 19.40 \\
+X BLEU & 41.11 & 31.96 & 25.27 & 20.74 & 19.54 \\
+BLEU & 19.40 & 19.40 & 19.40 & 19.40 & 19.40 \\
+\hline
+}
+\end{block}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "poster"
+%%% End: 

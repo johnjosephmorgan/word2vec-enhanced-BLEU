@@ -1,0 +1,38 @@
+graph metrics {
+one [label="1"];
+two [label="2"];
+three [label="3"];
+four [label="4"];
+uno [label="1"];
+dos [label="2"];
+tres [label="3"];
+cuatro [label="4"];
+onex [label="1"];
+twox [label="2"];
+threex [label="3"];
+fourx [label="4"];
+unox [label="1"];
+dosx [label="2"];
+tresx [label="3"];
+cuatrox [label="4"];
+one -- uno;
+two -- dos;
+three -- tres;
+four -- cuatro;
+onex -- unox;
+onex -- dosx;
+onex -- tresx;
+onex -- quatrox;
+twox -- unox;
+twox -- dosx;
+twox -- tresx;
+twox -- cuatrox;
+threex -- unox;
+threex -- dosx;
+threex -- tresx;
+threex -- cuatrox;
+fourx -- unox;
+fourx -- dosx;
+fourx -- tresx;
+fourx -- cuatrox;
+}
