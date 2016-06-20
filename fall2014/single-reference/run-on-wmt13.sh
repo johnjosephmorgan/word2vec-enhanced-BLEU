@@ -6,32 +6,25 @@ rm -Rf logs/
 
 mkdir -p scores logs
 
-for corpus in wmt13 anomolous
-do
 python \
 bleu/bleu.py  \
--C data/eval_$corpus.txt \
-> scores/bleu-run-$corpus.txt
-done
+-C data/eval_wmt13.txt \
+> scores/bleu-run-wmt13.txt
 
-for corpus in wmt13 anomolous
-do
+
 python \
 svxleu/svxleu.py \
--C data/eval_$corpus.txt \
+-C data/eval_wmt13.txt \
 -V ./GoogleNews-vectors-negative300.bin.gz \
 -t 0.80 \
-> scores/${corpus}.txt
-done
+> scores/wmt13.txt
+
 
 mkdir -p results
 
-for corpus in wmt13 anomolous
-do
-echo "method	relevant	total	precision	score" > results/${corpus}.txt
-cat scores/${corpus}.txt \
->> results/${corpus}.txt
-done
+echo "method	relevant	total	precision	score" > results/wmt13.txt
+cat scores/wmt13.txt \
+>> results/wmt13.txt
 
 scripts/multi-bleu.perl \
 data/eval_corpus_ref.txt \
